@@ -65,7 +65,9 @@ export const USERS: Record<string, { password: string; role: string; name: strin
   magang: { password: 'magang123', role: 'user', name: 'Magang' },
 };
 
-export const COLORS = {
+import { Appearance } from 'react-native';
+
+const LIGHT_COLORS = {
   // Core palette — deep greens + warm neutrals
   primary: '#1a6b3c',
   primarySoft: 'rgba(26,107,60,0.07)',
@@ -101,6 +103,46 @@ export const COLORS = {
   tds: '#8b6a3e',
   suhuAir: '#0e7490',
 };
+
+const DARK_COLORS = {
+  // Core palette
+  primary: '#27ae60',
+  primarySoft: 'rgba(39,174,96,0.15)',
+  primaryBorder: 'rgba(39,174,96,0.3)',
+
+  // Surfaces
+  background: '#121212',
+  surface: '#1e1e1e',
+  surfaceElevated: '#2d2d2d',
+
+  // Text
+  textPrimary: '#e0e0e0',
+  textSecondary: '#a0a0a0',
+  textMuted: '#777777',
+  textLight: '#555555',
+
+  // Borders
+  border: 'rgba(255,255,255,0.1)',
+  borderLight: 'rgba(255,255,255,0.05)',
+
+  // Status
+  error: '#e74c3c',
+  errorSoft: 'rgba(231,76,60,0.15)',
+  warning: '#f39c12',
+  warningSoft: 'rgba(243,156,18,0.15)',
+  success: '#27ae60',
+  successSoft: 'rgba(39,174,96,0.15)',
+
+  // Sensor accent colors
+  suhu: '#e67e22',
+  kelembapan: '#3498db',
+  ec: '#27ae60',
+  tds: '#d4ac0d',
+  suhuAir: '#1abc9c',
+};
+
+const colorScheme = Appearance.getColorScheme();
+export const COLORS = colorScheme === 'dark' ? DARK_COLORS : LIGHT_COLORS;
 
 export const TYPOGRAPHY = {
   fontLight: '300',
