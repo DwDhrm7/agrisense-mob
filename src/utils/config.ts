@@ -1,7 +1,3 @@
-// ──────────────────────────────────────────────
-// AgriSense · Configuration
-// ──────────────────────────────────────────────
-
 import {
   MQTT_HOST,
   MQTT_PORT,
@@ -19,12 +15,12 @@ import {
 } from '@env';
 
 export const MQTT_CONFIG = {
-  host: MQTT_HOST || '43fb5c6796dd440693f33baa44223b55.s1.eu.hivemq.cloud',
+  host: MQTT_HOST || '',
   port: Number(MQTT_PORT) || 8884,
   path: '/mqtt',
   useSSL: true,
-  username: MQTT_USERNAME || 'arthur',
-  password: MQTT_PASSWORD || 'Arthur1234',
+  username: MQTT_USERNAME || '',
+  password: MQTT_PASSWORD || '',
   topicXY: MQTT_TOPIC_XY || 'sensor/xy_md02',
   topicBSK: MQTT_TOPIC_BSK || 'sensor/bsk_ec100',
 };
@@ -45,13 +41,13 @@ export const OPENMETEO_CONFIG = {
 
 export const TELEGRAM_CONFIG = {
   enabled: true,
-  botToken: TELEGRAM_BOT_TOKEN || 'YOUR_TELEGRAM_BOT_TOKEN',
-  chatId: TELEGRAM_CHAT_ID || 'YOUR_TELEGRAM_CHAT_ID',
+  botToken: TELEGRAM_BOT_TOKEN || '',
+  chatId: TELEGRAM_CHAT_ID || '',
 };
 
 export const GEMINI_CONFIG = {
   enabled: true,
-  apiKey: GEMINI_API_KEY || 'AIzaSyD8p76JOaY5PKWAe3F7xk32tzxX1-o_oE0',
+  apiKey: GEMINI_API_KEY || '',
 };
 
 // Ambang batas sensor untuk alert
@@ -66,10 +62,9 @@ export const SENSOR_THRESHOLDS = {
 // Default Users
 export const USERS: Record<string, { password: string; role: string; name: string }> = {
   admin: { password: 'admin123', role: 'admin', name: 'Administrator' },
-  petani: { password: 'petani123', role: 'user', name: 'Petani' },
+  magang: { password: 'magang123', role: 'user', name: 'Magang' },
 };
 
-// ── Design Tokens ──────────────────────────────
 export const COLORS = {
   // Core palette — deep greens + warm neutrals
   primary: '#1a6b3c',
