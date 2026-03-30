@@ -2,40 +2,56 @@
 // AgriSense · Configuration
 // ──────────────────────────────────────────────
 
+import {
+  MQTT_HOST,
+  MQTT_PORT,
+  MQTT_USERNAME,
+  MQTT_PASSWORD,
+  MQTT_TOPIC_XY,
+  MQTT_TOPIC_BSK,
+  INFLUX_HOST,
+  INFLUX_DB,
+  OPENMETEO_LATITUDE,
+  OPENMETEO_LONGITUDE,
+  TELEGRAM_BOT_TOKEN,
+  TELEGRAM_CHAT_ID,
+  GEMINI_API_KEY,
+} from '@env';
+
 export const MQTT_CONFIG = {
-  host: '43fb5c6796dd440693f33baa44223b55.s1.eu.hivemq.cloud',
-  port: 8884,
+  host: MQTT_HOST || '43fb5c6796dd440693f33baa44223b55.s1.eu.hivemq.cloud',
+  port: Number(MQTT_PORT) || 8884,
   path: '/mqtt',
   useSSL: true,
-  username: 'arthur',
-  password: 'Arthur1234',
-  topicXY: 'sensor/xy_md02',
-  topicBSK: 'sensor/bsk_ec100',
+  username: MQTT_USERNAME || 'arthur',
+  password: MQTT_PASSWORD || 'Arthur1234',
+  topicXY: MQTT_TOPIC_XY || 'sensor/xy_md02',
+  topicBSK: MQTT_TOPIC_BSK || 'sensor/bsk_ec100',
 };
 
 export const INFLUX_CONFIG = {
-  host: 'http://192.168.0.79:8086',
-  db: 'sensor_db',
+  host: INFLUX_HOST || 'http://192.168.0.79:8086',
+  db: INFLUX_DB || 'sensor_db',
   interval: 5000,
 };
 
 export const OPENMETEO_CONFIG = {
   enabled: true,
-  latitude: -8.65,
-  longitude: 115.2167,
+  latitude: Number(OPENMETEO_LATITUDE) || -8.65,
+  longitude: Number(OPENMETEO_LONGITUDE) || 115.2167,
   timezone: 'Asia/Singapore',
   city: 'Denpasar',
 };
 
 export const TELEGRAM_CONFIG = {
   enabled: true,
-  botToken: 'YOUR_TELEGRAM_BOT_TOKEN',
-  chatId: 'YOUR_TELEGRAM_CHAT_ID',
+  botToken: TELEGRAM_BOT_TOKEN || 'YOUR_TELEGRAM_BOT_TOKEN',
+  chatId: TELEGRAM_CHAT_ID || 'YOUR_TELEGRAM_CHAT_ID',
 };
 
 export const GEMINI_CONFIG = {
   enabled: true,
-  apiKey: 'AIzaSyD8p76JOaY5PKWAe3F7xk32tzxX1-o_oE0',
+  apiKey: GEMINI_API_KEY || 'AIzaSyD8p76JOaY5PKWAe3F7xk32tzxX1-o_oE0',
 };
 
 // Ambang batas sensor untuk alert
