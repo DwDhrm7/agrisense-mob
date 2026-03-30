@@ -1,97 +1,82 @@
-This is a new [**React Native**](https://reactnative.dev) project, bootstrapped using [`@react-native-community/cli`](https://github.com/react-native-community/cli).
+# AgriSense Mobile 🌾📱
 
-# Getting Started
+AgriSense Mobile is a React Native iOS and Android application designed for real-time agricultural monitoring and greenhouse management. With a clean, modern, and intuitive user interface, AgriSense provides farmers and agriculturists with critical environmental data, plant recommendations, weather insights, and remote actuator control.
 
-> **Note**: Make sure you have completed the [Set Up Your Environment](https://reactnative.dev/docs/set-up-your-environment) guide before proceeding.
+## 🚀 Features
 
-## Step 1: Start Metro
+*   **Real-time Sensor Monitoring**: Monitor live data such as Temperature, Humidity, Soil Moisture, and Light Intensity using MQTT (`paho-mqtt`).
+*   **Actuator Control**: Remotely turn on/off pumps, fans, and grow lights directly from the app.
+*   **Weather Insights**: Integrated with Open-Meteo for accurate, localized weather data tailored for agricultural needs.
+*   **Smart AI Recommendations**: Powered by Gemini AI, receive actionable advice on crop health and greenhouse optimization.
+*   **Historical Data Tracking & Charts**: Visualize sensor trends over time using interactive graphs (`react-native-chart-kit`).
+*   **System Alerts & Logs**: Keep track of events, connection statuses, and critical alerts natively in the app.
+*   **Premium Custom UI**: An elegant, visually appealing interface designed specifically for agricultural workflows.
 
-First, you will need to run **Metro**, the JavaScript build tool for React Native.
+## 🛠️ Technology Stack
 
-To start the Metro dev server, run the following command from the root of your React Native project:
+*   [React Native](https://reactnative.dev/) (Version 0.84+) - Core framework
+*   [Paho MQTT](https://eclipse.dev/paho/index.php?page=clients/js/index.php) - Real-time communication protocol
+*   [React Native Chart Kit](https://github.com/indiespirit/react-native-chart-kit) - Data visualization
+*   [TypeScript](https://www.typescriptlang.org/) - Type checking and robust code maintenance
 
-```sh
-# Using npm
-npm start
+## ⚙️ Getting Started
 
-# OR using Yarn
-yarn start
-```
+### Prerequisites
 
-## Step 2: Build and run your app
+*   Node.js (>= 22.11.0)
+*   npm or yarn
+*   Ruby and CocoaPods (for iOS)
+*   Xcode (for iOS development)
+*   Android Studio (for Android development)
 
-With Metro running, open a new terminal window/pane from the root of your React Native project, and use one of the following commands to build and run your Android or iOS app:
+### Installation
 
-### Android
+1.  **Clone the repository:**
+    ```bash
+    git clone https://github.com/DwDhrm7/agrisense-mob.git
+    cd agrisense-mob
+    ```
 
-```sh
-# Using npm
+2.  **Install dependencies:**
+    ```bash
+    npm install
+    # or
+    yarn install
+    ```
+
+3.  **Install iOS Pods:**
+    *(Only required if developing for iOS on macOS)*
+    ```bash
+    cd ios && pod install && cd ..
+    ```
+
+### Running the Application
+
+**For Android:**
+```bash
 npm run android
-
-# OR using Yarn
-yarn android
 ```
 
-### iOS
-
-For iOS, remember to install CocoaPods dependencies (this only needs to be run on first clone or after updating native deps).
-
-The first time you create a new project, run the Ruby bundler to install CocoaPods itself:
-
-```sh
-bundle install
-```
-
-Then, and every time you update your native dependencies, run:
-
-```sh
-bundle exec pod install
-```
-
-For more information, please visit [CocoaPods Getting Started guide](https://guides.cocoapods.org/using/getting-started.html).
-
-```sh
-# Using npm
+**For iOS:**
+```bash
 npm run ios
-
-# OR using Yarn
-yarn ios
 ```
 
-If everything is set up correctly, you should see your new app running in the Android Emulator, iOS Simulator, or your connected device.
+**Start Metro Bundler directly:**
+```bash
+npm start
+```
 
-This is one way to run your app — you can also build it directly from Android Studio or Xcode.
+## 📂 Project Structure
 
-## Step 3: Modify your app
+*   `src/components/`: Reusable UI components (Sensor Cards, Buttons, Charts)
+*   `src/screens/`: Main application screens (Dashboard, History, Settings, etc.)
+*   `src/services/`: Services for API integration (MQTT, Weather, Gemini AI)
+*   `src/utils/`: Configuration files and utility helper functions
+*   `src/hooks/`: Custom React hooks (e.g., MQTT connection management)
 
-Now that you have successfully run the app, let's make changes!
+## 🤝 Contributing
+Contributions, issues, and feature requests are welcome! Feel free to check the issues page if you want to contribute.
 
-Open `App.tsx` in your text editor of choice and make some changes. When you save, your app will automatically update and reflect these changes — this is powered by [Fast Refresh](https://reactnative.dev/docs/fast-refresh).
-
-When you want to forcefully reload, for example to reset the state of your app, you can perform a full reload:
-
-- **Android**: Press the <kbd>R</kbd> key twice or select **"Reload"** from the **Dev Menu**, accessed via <kbd>Ctrl</kbd> + <kbd>M</kbd> (Windows/Linux) or <kbd>Cmd ⌘</kbd> + <kbd>M</kbd> (macOS).
-- **iOS**: Press <kbd>R</kbd> in iOS Simulator.
-
-## Congratulations! :tada:
-
-You've successfully run and modified your React Native App. :partying_face:
-
-### Now what?
-
-- If you want to add this new React Native code to an existing application, check out the [Integration guide](https://reactnative.dev/docs/integration-with-existing-apps).
-- If you're curious to learn more about React Native, check out the [docs](https://reactnative.dev/docs/getting-started).
-
-# Troubleshooting
-
-If you're having issues getting the above steps to work, see the [Troubleshooting](https://reactnative.dev/docs/troubleshooting) page.
-
-# Learn More
-
-To learn more about React Native, take a look at the following resources:
-
-- [React Native Website](https://reactnative.dev) - learn more about React Native.
-- [Getting Started](https://reactnative.dev/docs/environment-setup) - an **overview** of React Native and how setup your environment.
-- [Learn the Basics](https://reactnative.dev/docs/getting-started) - a **guided tour** of the React Native **basics**.
-- [Blog](https://reactnative.dev/blog) - read the latest official React Native **Blog** posts.
-- [`@facebook/react-native`](https://github.com/facebook/react-native) - the Open Source; GitHub **repository** for React Native.
+## 📜 License
+This project is proprietary and intended for internal or specific use.
