@@ -9,22 +9,38 @@
 /* Begin PBXBuildFile section */
 		0C80B921A6F3F58F76C31292 /* libPods-MonitoringMobile.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 5DCACB8F33CDC322A6C60F78 /* libPods-MonitoringMobile.a */; };
 		13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
+		26677AA5709644C2A8BD917E /* Outfit-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 6F31B557E1D1489CBABB056E /* Outfit-Bold.ttf */; };
+		2D874880ECC341ECA0F0E344 /* Inter-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 101A24D5EB3B476EB7FE40A4 /* Inter-Bold.ttf */; };
+		2F83C6A764564F07AC93F590 /* Outfit-Medium.ttf in Resources */ = {isa = PBXBuildFile; fileRef = CDE2B377934D43769EFD3364 /* Outfit-Medium.ttf */; };
 		6E4A61EC038FFFFE8A01A9A9 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB81A68108700A75B9A /* PrivacyInfo.xcprivacy */; };
 		761780ED2CA45674006654EE /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 761780EC2CA45674006654EE /* AppDelegate.swift */; };
+		7B590C2DC9214BAC95DDCDF1 /* Outfit-SemiBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 456C3A54A4C04A149B6CE049 /* Outfit-SemiBold.ttf */; };
 		81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */; };
+		CB0B056757D643A2851D838C /* Inter-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 61742EB5A0F948BA856F898E /* Inter-Regular.ttf */; };
+		CCB9477D07954EA69B15FF5D /* Inter-Medium.ttf in Resources */ = {isa = PBXBuildFile; fileRef = F0EC27B54E5C4149BA4ED966 /* Inter-Medium.ttf */; };
+		EB8D7AB52CAC4240951B0339 /* Outfit-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = C70D5E21E3054A53A3C033F5 /* Outfit-Regular.ttf */; };
+		FCEEF6D2026649D3BE885F40 /* Inter-SemiBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 3BD0CA31F4794CEFA6D5215C /* Inter-SemiBold.ttf */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		101A24D5EB3B476EB7FE40A4 /* Inter-Bold.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Inter-Bold.ttf"; path = "../assets/fonts/Inter-Bold.ttf"; sourceTree = "<group>"; };
 		13B07F961A680F5B00A75B9A /* MonitoringMobile.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MonitoringMobile.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		13B07FB51A68108700A75B9A /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = MonitoringMobile/Images.xcassets; sourceTree = "<group>"; };
 		13B07FB61A68108700A75B9A /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = MonitoringMobile/Info.plist; sourceTree = "<group>"; };
 		13B07FB81A68108700A75B9A /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = PrivacyInfo.xcprivacy; path = MonitoringMobile/PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		3B4392A12AC88292D35C810B /* Pods-MonitoringMobile.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-MonitoringMobile.debug.xcconfig"; path = "Target Support Files/Pods-MonitoringMobile/Pods-MonitoringMobile.debug.xcconfig"; sourceTree = "<group>"; };
+		3BD0CA31F4794CEFA6D5215C /* Inter-SemiBold.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Inter-SemiBold.ttf"; path = "../assets/fonts/Inter-SemiBold.ttf"; sourceTree = "<group>"; };
+		456C3A54A4C04A149B6CE049 /* Outfit-SemiBold.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Outfit-SemiBold.ttf"; path = "../assets/fonts/Outfit-SemiBold.ttf"; sourceTree = "<group>"; };
 		5709B34CF0A7D63546082F79 /* Pods-MonitoringMobile.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-MonitoringMobile.release.xcconfig"; path = "Target Support Files/Pods-MonitoringMobile/Pods-MonitoringMobile.release.xcconfig"; sourceTree = "<group>"; };
 		5DCACB8F33CDC322A6C60F78 /* libPods-MonitoringMobile.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-MonitoringMobile.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		61742EB5A0F948BA856F898E /* Inter-Regular.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Inter-Regular.ttf"; path = "../assets/fonts/Inter-Regular.ttf"; sourceTree = "<group>"; };
+		6F31B557E1D1489CBABB056E /* Outfit-Bold.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Outfit-Bold.ttf"; path = "../assets/fonts/Outfit-Bold.ttf"; sourceTree = "<group>"; };
 		761780EC2CA45674006654EE /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = AppDelegate.swift; path = MonitoringMobile/AppDelegate.swift; sourceTree = "<group>"; };
 		81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = LaunchScreen.storyboard; path = MonitoringMobile/LaunchScreen.storyboard; sourceTree = "<group>"; };
+		C70D5E21E3054A53A3C033F5 /* Outfit-Regular.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Outfit-Regular.ttf"; path = "../assets/fonts/Outfit-Regular.ttf"; sourceTree = "<group>"; };
+		CDE2B377934D43769EFD3364 /* Outfit-Medium.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Outfit-Medium.ttf"; path = "../assets/fonts/Outfit-Medium.ttf"; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
+		F0EC27B54E5C4149BA4ED966 /* Inter-Medium.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Inter-Medium.ttf"; path = "../assets/fonts/Inter-Medium.ttf"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -60,6 +76,21 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
+		7D720D374816488AA8FC422C /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				F0EC27B54E5C4149BA4ED966 /* Inter-Medium.ttf */,
+				6F31B557E1D1489CBABB056E /* Outfit-Bold.ttf */,
+				C70D5E21E3054A53A3C033F5 /* Outfit-Regular.ttf */,
+				456C3A54A4C04A149B6CE049 /* Outfit-SemiBold.ttf */,
+				101A24D5EB3B476EB7FE40A4 /* Inter-Bold.ttf */,
+				61742EB5A0F948BA856F898E /* Inter-Regular.ttf */,
+				CDE2B377934D43769EFD3364 /* Outfit-Medium.ttf */,
+				3BD0CA31F4794CEFA6D5215C /* Inter-SemiBold.ttf */,
+			);
+			name = Resources;
+			sourceTree = "<group>";
+		};
 		832341AE1AAA6A7D00B99B32 /* Libraries */ = {
 			isa = PBXGroup;
 			children = (
@@ -75,6 +106,7 @@
 				83CBBA001A601CBA00E9B192 /* Products */,
 				2D16E6871FA4F8E400B85C8A /* Frameworks */,
 				BBD78D7AC51CEA395F1C20DB /* Pods */,
+				7D720D374816488AA8FC422C /* Resources */,
 			);
 			indentWidth = 2;
 			sourceTree = "<group>";
@@ -161,6 +193,14 @@
 				81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */,
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
 				6E4A61EC038FFFFE8A01A9A9 /* PrivacyInfo.xcprivacy in Resources */,
+				CCB9477D07954EA69B15FF5D /* Inter-Medium.ttf in Resources */,
+				26677AA5709644C2A8BD917E /* Outfit-Bold.ttf in Resources */,
+				EB8D7AB52CAC4240951B0339 /* Outfit-Regular.ttf in Resources */,
+				7B590C2DC9214BAC95DDCDF1 /* Outfit-SemiBold.ttf in Resources */,
+				2D874880ECC341ECA0F0E344 /* Inter-Bold.ttf in Resources */,
+				CB0B056757D643A2851D838C /* Inter-Regular.ttf in Resources */,
+				2F83C6A764564F07AC93F590 /* Outfit-Medium.ttf in Resources */,
+				FCEEF6D2026649D3BE885F40 /* Inter-SemiBold.ttf in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -191,9 +231,13 @@
 			inputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-MonitoringMobile/Pods-MonitoringMobile-frameworks-${CONFIGURATION}-input-files.xcfilelist",
 			);
+			inputPaths = (
+			);
 			name = "[CP] Embed Pods Frameworks";
 			outputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-MonitoringMobile/Pods-MonitoringMobile-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -230,9 +274,13 @@
 			inputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-MonitoringMobile/Pods-MonitoringMobile-resources-${CONFIGURATION}-input-files.xcfilelist",
 			);
+			inputPaths = (
+			);
 			name = "[CP] Copy Pods Resources";
 			outputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-MonitoringMobile/Pods-MonitoringMobile-resources-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -260,6 +308,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = T274T25TV5;
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = MonitoringMobile/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 15.1;
@@ -273,7 +322,7 @@
 					"-ObjC",
 					"-lc++",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = "org.reactjs.native.example.$(PRODUCT_NAME:rfc1034identifier)";
+				PRODUCT_BUNDLE_IDENTIFIER = com.monitoringmobile.dewadharma;
 				PRODUCT_NAME = MonitoringMobile;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
@@ -290,6 +339,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = T274T25TV5;
 				INFOPLIST_FILE = MonitoringMobile/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 15.1;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -302,7 +352,7 @@
 					"-ObjC",
 					"-lc++",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = "org.reactjs.native.example.$(PRODUCT_NAME:rfc1034identifier)";
+				PRODUCT_BUNDLE_IDENTIFIER = com.monitoringmobile.dewadharma;
 				PRODUCT_NAME = MonitoringMobile;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SWIFT_VERSION = 5.0;
