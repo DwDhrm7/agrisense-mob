@@ -3,7 +3,8 @@
 // ──────────────────────────────────────────────
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
-import { COLORS, OPENMETEO_CONFIG } from '../utils/config';
+import { OPENMETEO_CONFIG } from '../utils/config';
+import { useTheme } from '../utils/theme';
 import type { WeatherData } from '../services/WeatherService';
 
 interface WeatherCardProps {
@@ -12,6 +13,9 @@ interface WeatherCardProps {
 }
 
 const WeatherCard: React.FC<WeatherCardProps> = ({ weather, loading }) => {
+  const COLORS = useTheme();
+  const styles = typeof getStyles !== "undefined" ? getStyles(COLORS) : {} as any;
+
   if (loading) {
     return (
       <View style={styles.container}>
@@ -79,7 +83,7 @@ const WeatherCard: React.FC<WeatherCardProps> = ({ weather, loading }) => {
   );
 };
 
-const styles = StyleSheet.create({
+const getStyles = (COLORS: any) => StyleSheet.create({
   container: {
     backgroundColor: COLORS.surface,
     borderRadius: 16,

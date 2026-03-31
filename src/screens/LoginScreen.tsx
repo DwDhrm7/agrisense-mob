@@ -7,13 +7,17 @@ import {
   Platform, KeyboardAvoidingView, Animated, Easing, Image
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { USERS, COLORS } from '../utils/config';
+import { USERS } from '../utils/config';
+import { useTheme } from '../utils/theme';
 
 interface LoginScreenProps {
   onLogin: (user: any) => void;
 }
 
 const LoginScreen: React.FC<LoginScreenProps> = ({ onLogin }) => {
+  const COLORS = useTheme();
+  const styles = typeof getStyles !== "undefined" ? getStyles(COLORS) : {} as any;
+
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState(false);
@@ -138,7 +142,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onLogin }) => {
   );
 };
 
-const styles = StyleSheet.create({
+const getStyles = (COLORS: any) => StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: COLORS.background,

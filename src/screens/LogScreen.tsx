@@ -3,7 +3,7 @@
 // ──────────────────────────────────────────────
 import React, { useState, useEffect, useCallback } from 'react';
 import { View, Text, ScrollView, StyleSheet, TouchableOpacity, RefreshControl } from 'react-native';
-import { COLORS } from '../utils/config';
+import { useTheme } from '../utils/theme';
 import DataStore, { LogEntry } from '../services/DataStore';
 
 type FilterType = 'all' | 'mqtt' | 'sensor' | 'alert' | 'system';
@@ -17,6 +17,8 @@ const FILTERS: { id: FilterType; label: string }[] = [
 ];
 
 const LogScreen: React.FC = () => {
+  const COLORS = useTheme();
+  const styles = getStyles(COLORS);
   const [logs, setLogs] = useState<LogEntry[]>([]);
   const [filter, setFilter] = useState<FilterType>('all');
   const [refreshing, setRefreshing] = useState(false);
@@ -120,7 +122,7 @@ const LogScreen: React.FC = () => {
   );
 };
 
-const styles = StyleSheet.create({
+const getStyles = (COLORS: any) => StyleSheet.create({
   container: { flex: 1, backgroundColor: COLORS.background },
   header: {
     backgroundColor: COLORS.surface,

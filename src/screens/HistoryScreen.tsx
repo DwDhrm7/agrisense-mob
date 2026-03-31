@@ -2,11 +2,13 @@
 // AgriSense · History Screen
 // ──────────────────────────────────────────────
 import React, { useState, useEffect, useCallback } from 'react';
-import { View, Text, ScrollView, StyleSheet, TouchableOpacity, RefreshControl } from 'react-native';
-import { COLORS } from '../utils/config';
+import { View, Text, ScrollView, StyleSheet, TouchableOpacity, RefreshControl, Dimensions } from 'react-native';
+import { useTheme } from '../utils/theme';
 import DataStore, { HistoryEntry } from '../services/DataStore';
 
 const HistoryScreen: React.FC = () => {
+  const COLORS = useTheme();
+  const styles = getStyles(COLORS);
   const [history, setHistory] = useState<HistoryEntry[]>([]);
   const [stats, setStats] = useState(DataStore.getStats());
   const [refreshing, setRefreshing] = useState(false);
@@ -160,15 +162,19 @@ const HistoryScreen: React.FC = () => {
 };
 
 // ── StatBox ──
-const StatBox = ({ label, value, unit }: { label: string; value: string; unit?: string }) => (
+const StatBox = ({ label, value, unit }: { label: string; value: string; unit?: string }) => {
+  const COLORS = useTheme();
+  const styles = getStyles(COLORS);
+  return (
   <View style={styles.statBox}>
     <Text style={styles.statValue}>{value}</Text>
     {unit && <Text style={styles.statUnit}>{unit}</Text>}
     <Text style={styles.statLabel}>{label}</Text>
   </View>
-);
+  );
+};
 
-const styles = StyleSheet.create({
+const getStyles = (COLORS: any) => StyleSheet.create({
   container: { flex: 1, backgroundColor: COLORS.background },
   header: {
     backgroundColor: COLORS.surface,

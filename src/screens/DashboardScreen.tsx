@@ -4,10 +4,12 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import {
   View, Text, ScrollView, StyleSheet, TouchableOpacity,
-  Dimensions, RefreshControl, AppState,
+  Dimensions, RefreshControl, AppState, Switch, NativeModules, Alert, Appearance,
+  Animated
 } from 'react-native';
 import { LineChart } from 'react-native-chart-kit';
-import { COLORS } from '../utils/config';
+import { LIGHT_COLORS, DARK_COLORS } from '../utils/config';
+import { useTheme, setGlobalTheme, isDarkModeGlobal } from '../utils/theme';
 import MqttService, { SensorData, ConnectionStatus } from '../services/MqttService';
 import { fetchWeather, WeatherData } from '../services/WeatherService';
 import { AlertItem } from '../services/AlertService';
@@ -36,12 +38,60 @@ const INITIAL_SENSORS: SensorData = {
   suhu: '–', kelembapan: '–', ec: '–', tds: '–', suhuAir: '–',
 };
 
+const ThemeSwitch = ({ isDark, onToggle, COLORS }: any) => {
+  const animValue = useRef(new Animated.Value(isDark ? 1 : 0)).current;
+
+  useEffect(() => {
+    Animated.timing(animValue, {
+      toValue: isDark ? 1 : 0,
+      duration: 250,
+      useNativeDriver: false,
+    }).start();
+  }, [isDark, animValue]);
+
+  const translateX = animValue.interpolate({
+    inputRange: [0, 1],
+    outputRange: [3, 25]
+  });
+
+  const bgColor = animValue.interpolate({
+    inputRange: [0, 1],
+    outputRange: ['#cbd5e1', COLORS.primary]
+  });
+
+  return (
+    <TouchableOpacity activeOpacity={0.8} onPress={() => onToggle(!isDark)}>
+      <Animated.View style={{
+        width: 50, height: 28, borderRadius: 14,
+        backgroundColor: bgColor, justifyContent: 'center',
+      }}>
+        <Animated.View style={{
+          width: 22, height: 22, borderRadius: 11,
+          backgroundColor: '#ffffff',
+          transform: [{ translateX }],
+          justifyContent: 'center', alignItems: 'center',
+          shadowColor: '#000', shadowOffset: { width: 0, height: 2 },
+          shadowOpacity: 0.15, shadowRadius: 3, elevation: 2,
+        }}>
+          <Text style={{ fontSize: 11, transform: [{ translateY: -1 }, { translateX: isDark ? 0.5 : 0 }] }}>
+            {isDark ? '🌙' : '☀️'}
+          </Text>
+        </Animated.View>
+      </Animated.View>
+    </TouchableOpacity>
+  );
+};
+
 const DashboardScreen: React.FC<DashboardScreenProps> = ({ 
   user, onLogout, status, sensors, lastUpdate, alerts, historyXY
 }) => {
   const [weather, setWeather] = useState<WeatherData | null>(null);
   const [weatherLoading, setWeatherLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+  const COLORS = useTheme();
+  const [isDarkTheme, setIsDarkTheme] = useState(isDarkModeGlobal);
+  const styles = getStyles(COLORS);
+  
   const appStateRef = useRef(AppState.currentState);
 
   // ─── Weather ──────────────────────────────
@@ -114,14 +164,19 @@ const DashboardScreen: React.FC<DashboardScreenProps> = ({
           <Text style={styles.headerSub}>Smart Farm Monitoring</Text>
         </View>
         <View style={styles.headerRight}>
-          <View style={styles.avatar}>
-            <Text style={styles.avatarLetter}>
-              {(user.name || user.username || 'U')[0].toUpperCase()}
-            </Text>
+          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+            <ThemeSwitch
+              isDark={isDarkTheme}
+              COLORS={COLORS}
+              onToggle={(val: boolean) => {
+                setIsDarkTheme(val);
+                setGlobalTheme(val);
+                if (Appearance.setColorScheme) {
+                  Appearance.setColorScheme(val ? 'dark' : 'light');
+                }
+              }}
+            />
           </View>
-          <TouchableOpacity style={styles.logoutBtn} onPress={onLogout} activeOpacity={0.6}>
-            <Text style={styles.logoutText}>Keluar</Text>
-          </TouchableOpacity>
         </View>
       </View>
 
@@ -240,7 +295,7 @@ const DashboardScreen: React.FC<DashboardScreenProps> = ({
   );
 };
 
-const styles = StyleSheet.create({
+const getStyles = (COLORS: any) => StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: COLORS.background,

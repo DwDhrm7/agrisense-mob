@@ -3,7 +3,7 @@
 // ──────────────────────────────────────────────
 import React, { useEffect, useRef } from 'react';
 import { View, Text, StyleSheet, Animated, Easing } from 'react-native';
-import { COLORS } from '../utils/config';
+import { useTheme } from '../utils/theme';
 import type { ConnectionStatus } from '../services/MqttService';
 
 interface StatusBarProps {
@@ -12,6 +12,9 @@ interface StatusBarProps {
 }
 
 const ConnectionStatusBar: React.FC<StatusBarProps> = ({ status, lastUpdate }) => {
+  const COLORS = useTheme();
+  const styles = typeof getStyles !== "undefined" ? getStyles(COLORS) : {} as any;
+
   const pulseAnim = useRef(new Animated.Value(0.3)).current;
 
   useEffect(() => {
@@ -44,7 +47,7 @@ const ConnectionStatusBar: React.FC<StatusBarProps> = ({ status, lastUpdate }) =
   );
 };
 
-const styles = StyleSheet.create({
+const getStyles = (COLORS: any) => StyleSheet.create({
   container: {
     flexDirection: 'row',
     justifyContent: 'space-between',

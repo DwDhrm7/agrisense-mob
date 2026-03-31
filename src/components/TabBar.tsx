@@ -4,7 +4,7 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Animated } from 'react-native';
 import Svg, { Path } from 'react-native-svg';
-import { COLORS } from '../utils/config';
+import { useTheme } from '../utils/theme';
 
 export type TabId = 'dashboard' | 'history' | 'log' | 'settings';
 
@@ -67,6 +67,9 @@ interface TabBarProps {
 }
 
 const TabBar: React.FC<TabBarProps> = ({ activeTab, onTabChange, alertCount = 0 }) => {
+  const COLORS = useTheme();
+  const styles = typeof getStyles !== "undefined" ? getStyles(COLORS) : {} as any;
+
   return (
     <View style={styles.container}>
       <View style={styles.inner}>
@@ -109,7 +112,7 @@ const TabBar: React.FC<TabBarProps> = ({ activeTab, onTabChange, alertCount = 0 
   );
 };
 
-const styles = StyleSheet.create({
+const getStyles = (COLORS: any) => StyleSheet.create({
   container: {
     backgroundColor: COLORS.surface,
     borderTopWidth: 1,

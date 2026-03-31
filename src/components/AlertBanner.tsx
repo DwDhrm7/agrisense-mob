@@ -3,7 +3,7 @@
 // ──────────────────────────────────────────────
 import React, { useEffect, useRef } from 'react';
 import { View, Text, StyleSheet, Animated } from 'react-native';
-import { COLORS } from '../utils/config';
+import { useTheme } from '../utils/theme';
 import type { AlertItem } from '../services/AlertService';
 
 interface AlertBannerProps {
@@ -11,6 +11,9 @@ interface AlertBannerProps {
 }
 
 const AlertBanner: React.FC<AlertBannerProps> = ({ alerts }) => {
+  const COLORS = useTheme();
+  const styles = typeof getStyles !== "undefined" ? getStyles(COLORS) : {} as any;
+
   const slideAnim = useRef(new Animated.Value(-80)).current;
   const opacityAnim = useRef(new Animated.Value(0)).current;
 
@@ -60,7 +63,7 @@ const AlertBanner: React.FC<AlertBannerProps> = ({ alerts }) => {
   );
 };
 
-const styles = StyleSheet.create({
+const getStyles = (COLORS: any) => StyleSheet.create({
   container: {
     flexDirection: 'row',
     borderRadius: 12,

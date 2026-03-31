@@ -6,7 +6,8 @@ import {
   View, Text, ScrollView, StyleSheet, TouchableOpacity,
   TextInput, Alert, Share, Switch,
 } from 'react-native';
-import { COLORS, MQTT_CONFIG, SENSOR_THRESHOLDS, OPENMETEO_CONFIG, INFLUX_CONFIG, TELEGRAM_CONFIG } from '../utils/config';
+import { MQTT_CONFIG, SENSOR_THRESHOLDS, OPENMETEO_CONFIG, INFLUX_CONFIG, TELEGRAM_CONFIG } from '../utils/config';
+import { useTheme } from '../utils/theme';
 import DataStore from '../services/DataStore';
 import MqttService from '../services/MqttService';
 import type { ConnectionStatus } from '../services/MqttService';
@@ -18,6 +19,9 @@ interface SettingsScreenProps {
 }
 
 const SettingsScreen: React.FC<SettingsScreenProps> = ({ user, connectionStatus, onLogout }) => {
+  const COLORS = useTheme();
+  const styles = typeof getStyles !== "undefined" ? getStyles(COLORS) : {} as any;
+
   const [thresholds, setThresholds] = useState({ ...SENSOR_THRESHOLDS });
   const [telegramConf, setTelegramConf] = useState({ ...TELEGRAM_CONFIG });
   const [editing, setEditing] = useState(false);
@@ -204,8 +208,8 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ user, connectionStatus,
             ))}
           </View>
           <View style={styles.card}>
-            <View style={[infoStyles.row, isAdmin && infoStyles.rowBorder]}>
-              <Text style={infoStyles.label}>Status Notifikasi</Text>
+            <View style={[getInfoStyles(COLORS).row, isAdmin && getInfoStyles(COLORS).rowBorder]}>
+              <Text style={getInfoStyles(COLORS).label}>Status Notifikasi</Text>
               {isAdmin && editingTg ? (
                 <Switch
                   value={telegramConf.enabled}
@@ -231,18 +235,18 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ user, connectionStatus,
               )}
             </View>
             {isAdmin && (
-              <View style={thrStyles.row}>
-                <Text style={thrStyles.label}>Bot Token</Text>
+              <View style={getThrStyles(COLORS).row}>
+                <Text style={getThrStyles(COLORS).label}>Bot Token</Text>
                 <TextInput
-                  style={[thrStyles.input, { marginTop: 8 }, !editingTg && thrStyles.inputDisabled]}
+                  style={[getThrStyles(COLORS).input, { marginTop: 8 }, !editingTg && getThrStyles(COLORS).inputDisabled]}
                   value={telegramConf.botToken}
                   onChangeText={(val) => setTelegramConf(prev => ({ ...prev, botToken: val }))}
                   editable={editingTg}
                   secureTextEntry={!editingTg}
                 />
-                <Text style={[thrStyles.label, { marginTop: 12 }]}>Chat ID Target</Text>
+                <Text style={[getThrStyles(COLORS).label, { marginTop: 12 }]}>Chat ID Target</Text>
                 <TextInput
-                  style={[thrStyles.input, { marginTop: 8 }, !editingTg && thrStyles.inputDisabled]}
+                  style={[getThrStyles(COLORS).input, { marginTop: 8 }, !editingTg && getThrStyles(COLORS).inputDisabled]}
                   value={telegramConf.chatId}
                   onChangeText={(val) => setTelegramConf(prev => ({ ...prev, chatId: val }))}
                   editable={editingTg}
@@ -270,7 +274,10 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ user, connectionStatus,
 
 const InfoRow = ({ label, value, valueColor, last }: {
   label: string; value: string; valueColor?: string; last?: boolean;
-}) => (
+}) => {
+  const COLORS = useTheme();
+  const infoStyles = getInfoStyles(COLORS);
+  return (
   <View style={[infoStyles.row, !last && infoStyles.rowBorder]}>
     <Text style={infoStyles.label}>{label}</Text>
     <Text style={[infoStyles.value, valueColor ? { color: valueColor } : {}]} numberOfLines={1}>
@@ -278,11 +285,15 @@ const InfoRow = ({ label, value, valueColor, last }: {
     </Text>
   </View>
 );
+};
 
 const ThresholdRow = ({ label, unit, min, max, editing, onMinChange, onMaxChange, last }: {
   label: string; unit: string; min: number; max: number;
   editing: boolean; onMinChange: (v: string) => void; onMaxChange: (v: string) => void; last?: boolean;
-}) => (
+}) => {
+  const COLORS = useTheme();
+  const thrStyles = getThrStyles(COLORS);
+  return (
   <View style={[thrStyles.row, !last && thrStyles.rowBorder]}>
     <View style={thrStyles.labelRow}>
       <Text style={thrStyles.label}>{label}</Text>
@@ -312,8 +323,12 @@ const ThresholdRow = ({ label, unit, min, max, editing, onMinChange, onMaxChange
     </View>
   </View>
 );
+};
 
-const FutureRow = ({ title, desc, last }: { title: string; desc: string; last?: boolean }) => (
+const FutureRow = ({ title, desc, last }: { title: string; desc: string; last?: boolean }) => {
+  const COLORS = useTheme();
+  const futStyles = getFutStyles(COLORS);
+  return (
   <View style={[futStyles.row, !last && futStyles.rowBorder]}>
     <View style={futStyles.dot} />
     <View style={futStyles.content}>
@@ -323,10 +338,11 @@ const FutureRow = ({ title, desc, last }: { title: string; desc: string; last?: 
     <Text style={futStyles.tag}>SOON</Text>
   </View>
 );
+};
 
 // ── Styles ──
 
-const styles = StyleSheet.create({
+const getStyles = (COLORS: any) => StyleSheet.create({
   container: { flex: 1, backgroundColor: COLORS.background },
   header: {
     backgroundColor: COLORS.surface, paddingHorizontal: 24,
@@ -380,7 +396,7 @@ const styles = StyleSheet.create({
   actionText: { fontSize: 13, fontFamily: 'Inter-Medium', color: COLORS.primary },
 });
 
-const infoStyles = StyleSheet.create({
+const getInfoStyles = (COLORS: any) => StyleSheet.create({
   row: {
     flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center',
     paddingHorizontal: 16, paddingVertical: 13,
@@ -390,7 +406,7 @@ const infoStyles = StyleSheet.create({
   value: { fontSize: 13, fontFamily: 'Inter-Medium', color: COLORS.textPrimary, maxWidth: '55%', textAlign: 'right' },
 });
 
-const thrStyles = StyleSheet.create({
+const getThrStyles = (COLORS: any) => StyleSheet.create({
   row: { padding: 16 },
   rowBorder: { borderBottomWidth: 1, borderBottomColor: COLORS.borderLight },
   labelRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 },
@@ -406,7 +422,7 @@ const thrStyles = StyleSheet.create({
   inputDisabled: { opacity: 0.5, backgroundColor: COLORS.surfaceElevated },
 });
 
-const futStyles = StyleSheet.create({
+const getFutStyles = (COLORS: any) => StyleSheet.create({
   row: {
     flexDirection: 'row', alignItems: 'center', padding: 16, gap: 12,
   },

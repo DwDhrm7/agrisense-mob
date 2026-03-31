@@ -67,7 +67,7 @@ export const USERS: Record<string, { password: string; role: string; name: strin
 
 import { Appearance } from 'react-native';
 
-const LIGHT_COLORS = {
+export const LIGHT_COLORS = {
   // Core palette — deep greens + warm neutrals
   primary: '#1a6b3c',
   primarySoft: 'rgba(26,107,60,0.07)',
@@ -104,7 +104,7 @@ const LIGHT_COLORS = {
   suhuAir: '#0e7490',
 };
 
-const DARK_COLORS = {
+export const DARK_COLORS = {
   // Core palette
   primary: '#27ae60',
   primarySoft: 'rgba(39,174,96,0.15)',

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ActivityIndicator, Alert } from 'react-native';
-import { COLORS } from '../utils/config';
+import { useTheme } from '../utils/theme';
 import type { SensorData } from '../services/MqttService';
 import { getGeminiRecommendation, type AIRecommendation } from '../services/GeminiService';
 
@@ -17,7 +17,7 @@ interface RecommendationCardProps {
   sensors: SensorData;
 }
 
-function getRecommendation(sensors: SensorData): Recommendation {
+function getRecommendation(sensors: SensorData, COLORS: any): Recommendation {
   const s = parseFloat(sensors.suhu);
   const h = parseFloat(sensors.kelembapan);
   const ec = parseFloat(sensors.ec);
@@ -116,6 +116,9 @@ function getRecommendation(sensors: SensorData): Recommendation {
 }
 
 const RecommendationCard: React.FC<RecommendationCardProps> = ({ sensors }) => {
+  const COLORS = useTheme();
+  const styles = getStyles(COLORS);
+
   const [loadingAI, setLoadingAI] = useState(false);
   const [aiRec, setAiRec] = useState<AIRecommendation | null>(null);
 
@@ -135,7 +138,7 @@ const RecommendationCard: React.FC<RecommendationCardProps> = ({ sensors }) => {
 
   const rec = aiRec
     ? { ...aiRec, confidence: '✨ AI Generated', accentColor: COLORS.primary }
-    : getRecommendation(sensors);
+    : getRecommendation(sensors, COLORS);
 
   return (
     <View style={styles.container}>
@@ -206,7 +209,7 @@ const RecommendationCard: React.FC<RecommendationCardProps> = ({ sensors }) => {
   );
 };
 
-const styles = StyleSheet.create({
+const getStyles = (COLORS: any) => StyleSheet.create({
   container: {
     backgroundColor: COLORS.surface,
     borderRadius: 16,

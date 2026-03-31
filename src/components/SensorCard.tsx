@@ -3,7 +3,8 @@
 // ──────────────────────────────────────────────
 import React, { useEffect, useRef } from 'react';
 import { View, Text, StyleSheet, Animated } from 'react-native';
-import { COLORS, SENSOR_THRESHOLDS } from '../utils/config';
+import { SENSOR_THRESHOLDS } from '../utils/config';
+import { useTheme } from '../utils/theme';
 
 interface SensorCardProps {
   label: string;
@@ -15,6 +16,9 @@ interface SensorCardProps {
 }
 
 const SensorCard: React.FC<SensorCardProps> = ({ label, subtitle, value, unit, color, sensorKey }) => {
+  const COLORS = useTheme();
+  const styles = typeof getStyles !== "undefined" ? getStyles(COLORS) : {} as any;
+
   const pulseAnim = useRef(new Animated.Value(1)).current;
   const prevValue = useRef(value);
 
@@ -62,7 +66,7 @@ const SensorCard: React.FC<SensorCardProps> = ({ label, subtitle, value, unit, c
   );
 };
 
-const styles = StyleSheet.create({
+const getStyles = (COLORS: any) => StyleSheet.create({
   card: {
     width: '47%',
     backgroundColor: COLORS.surface,

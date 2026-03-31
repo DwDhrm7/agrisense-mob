@@ -3,7 +3,7 @@
 // ──────────────────────────────────────────────
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, Switch, TouchableOpacity, TextInput } from 'react-native';
-import { COLORS } from '../utils/config';
+import { useTheme } from '../utils/theme';
 import DataStore from '../services/DataStore';
 // import MqttService from '../services/MqttService';
 
@@ -17,6 +17,9 @@ interface ActuatorProps {
 const DAYS = ['Sn', 'Sl', 'Rb', 'Km', 'Jm', 'Sb', 'Mg'];
 
 const ActuatorItem: React.FC<ActuatorProps> = ({ label, description, initialState = false, topic }) => {
+  const COLORS = useTheme();
+  const styles = typeof getStyles !== "undefined" ? getStyles(COLORS) : {} as any;
+
   const [isEnabled, setIsEnabled] = useState(initialState);
   
   const [expanded, setExpanded] = useState(false);
@@ -104,6 +107,8 @@ const ActuatorItem: React.FC<ActuatorProps> = ({ label, description, initialStat
 };
 
 const ActuatorControl: React.FC = () => {
+  const COLORS = useTheme();
+  const styles = getStyles(COLORS);
   return (
     <View style={styles.card}>
       <ActuatorItem 
@@ -130,7 +135,7 @@ const ActuatorControl: React.FC = () => {
   );
 };
 
-const styles = StyleSheet.create({
+const getStyles = (COLORS: any) => StyleSheet.create({
   card: {
     backgroundColor: COLORS.surface,
     borderRadius: 16,
