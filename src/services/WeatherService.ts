@@ -1,6 +1,4 @@
-// ──────────────────────────────────────────────
-// AgriSense · Weather Service (Open-Meteo)
-// ──────────────────────────────────────────────
+
 import { OPENMETEO_CONFIG } from '../utils/config';
 
 export interface WeatherData {
