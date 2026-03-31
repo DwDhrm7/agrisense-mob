@@ -107,42 +107,42 @@ export const LIGHT_COLORS = {
 };
 
 export const DARK_COLORS = {
-  // Core palette — Earthy Dark Liquid Apple
-  primary: '#D2E9E9', // Soft Mint
-  primarySoft: 'rgba(210, 233, 233, 0.04)',
-  primaryBorder: 'rgba(210, 233, 233, 0.12)',
+  // Core palette — Premium Earthy Dark Liquid Apple
+  primary: '#96B096', // Muted Sage (Elegant Primary)
+  primarySoft: 'rgba(150, 176, 150, 0.05)',
+  primaryBorder: 'rgba(150, 176, 150, 0.15)',
 
-  // iOS 26.0 Earthy Glass — Deep Forest Clay Background (No Black)
-  background: '#151C15', // Deep Forest Green (Very Earthy)
-  surface: 'rgba(255, 255, 255, 0.04)', // Ultra-translucency
-  surfaceElevated: 'rgba(255, 255, 255, 0.07)',
-  glassBorder: 'rgba(255, 255, 255, 0.15)', // Frosted stroke
-  glassShadow: 'rgba(0, 0, 0, 0.3)',
+  // iOS 26.0 Earthy Glass — Midnight Olive Background
+  background: '#0E120E', // Deep Organic Midnight (Softer than pure black)
+  surface: 'rgba(255, 255, 255, 0.03)', // Subtle translucency
+  surfaceElevated: 'rgba(255, 255, 255, 0.06)',
+  glassBorder: 'rgba(255, 255, 255, 0.12)', // Refined frosted stroke
+  glassShadow: 'rgba(0, 0, 0, 0.45)',
 
-  // Text — Muted Sage & Cream
-  textPrimary: '#F2F2F2',
-  textSecondary: '#EBF3EB',
-  textMuted: '#8E9A8E',
-  textLight: '#5D665D',
+  // Text — Creamy & Muted Sage
+  textPrimary: '#E8EDE8', // Soft Ivory
+  textSecondary: '#C5CDC5',
+  textMuted: '#7D8A7D',
+  textLight: '#4B544B',
 
   // Borders
-  border: 'rgba(255,255,255,0.06)',
-  borderLight: 'rgba(255,255,255,0.03)',
+  border: 'rgba(255, 255, 255, 0.05)',
+  borderLight: 'rgba(255, 255, 255, 0.02)',
 
-  // Status — Earthy variants
-  error: '#FF7675', // Muted Terracotta
-  errorSoft: 'rgba(255,118,117,0.1)',
-  warning: '#F4D03F', // Golden Sand
-  warningSoft: 'rgba(244,208,63,0.1)',
-  success: '#58D68D', // Soft Emerald
-  successSoft: 'rgba(88,214,141,0.1)',
+  // Status — Earthy variants (Muted)
+  error: '#CF6679', // Muted Terracotta
+  errorSoft: 'rgba(207, 102, 121, 0.08)',
+  warning: '#F3B431', // Warm Ochre
+  warningSoft: 'rgba(243, 180, 49, 0.08)',
+  success: '#81B622', // Olive Green
+  successSoft: 'rgba(129, 182, 34, 0.08)',
 
   // Sensor accents — Earthy scheme
-  suhu: '#FF7675', // Muted Terracotta
-  kelembapan: '#55E6C1', // Fresh Sage
-  ec: '#58D68D', // Soft Emerald
-  tds: '#E6C07B', // Clay/Sand
-  suhuAir: '#95A5A6', // Dusty Slate
+  suhu: '#CF6679', 
+  kelembapan: '#5BB381', // Muted Emerald
+  ec: '#81B622',
+  tds: '#A8907E', // Clay
+  suhuAir: '#7B8FA1', // Steel Blue-Gray
 };
 
 // export const COLORS = colorScheme === 'dark' ? DARK_COLORS : LIGHT_COLORS;

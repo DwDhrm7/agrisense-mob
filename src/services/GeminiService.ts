@@ -34,31 +34,30 @@ Penting: Berikan balasan STRICTLY dalam format JSON menggunakan struktur di bawa
   ]
 }`;
 
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_CONFIG.apiKey}`;
+  const url = `https://generativelanguage.googleapis.com/v1/models/gemini-2.5-flash:generateContent?key=${GEMINI_CONFIG.apiKey}`;
 
   const response = await fetch(url, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
       contents: [{ parts: [{ text: prompt }] }],
-      generationConfig: {
-        response_mime_type: 'application/json',
-      },
     }),
   });
 
   if (!response.ok) {
     const errData = await response.text();
     console.error('Gemini API Error:', errData);
-    throw new Error('Gagal menghubungi Gemini API. Periksa logs/console.');
+    throw new Error(`Gemini Error: ${errData.substring(0, 250)}`);
   }
 
   const data = await response.json();
-  const resultText = data.candidates?.[0]?.content?.parts?.[0]?.text;
+  let resultText = data.candidates?.[0]?.content?.parts?.[0]?.text;
 
   if (resultText) {
     try {
-      return JSON.parse(resultText) as AIRecommendation;
+      // Clean up markdown blocks if the model includes them
+      const jsonStr = resultText.replace(/```json|```/g, '').trim();
+      return JSON.parse(jsonStr) as AIRecommendation;
     } catch (e) {
       console.error('Gagal parsing JSON dari Gemini:', resultText);
       throw new Error('Format balasan Gemini tidak valid JSON.');
