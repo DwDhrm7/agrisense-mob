@@ -16,4 +16,8 @@ declare module '@env' {
   export const TELEGRAM_CHAT_ID: string;
 
   export const GEMINI_API_KEY: string;
+  export const MQTT_SSL: string;
+  export const API_URL: string;
+  export const ADMIN_PASSWORD: string;
+  export const MAGANG_PASSWORD: string;
 }

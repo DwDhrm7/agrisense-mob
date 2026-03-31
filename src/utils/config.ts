@@ -12,17 +12,26 @@ import {
   TELEGRAM_BOT_TOKEN,
   TELEGRAM_CHAT_ID,
   GEMINI_API_KEY,
+  MQTT_SSL,
+  API_URL,
+  ADMIN_PASSWORD,
+  MAGANG_PASSWORD,
 } from '@env';
 
 export const MQTT_CONFIG = {
-  host: MQTT_HOST || '',
-  port: Number(MQTT_PORT) || 8884,
+  host: MQTT_HOST || 'mqtt.1nva.de',
+  port: Number(MQTT_PORT) || 9001,
   path: '/mqtt',
-  useSSL: true,
+  useSSL: MQTT_SSL === 'true',
   username: MQTT_USERNAME || '',
   password: MQTT_PASSWORD || '',
-  topicXY: MQTT_TOPIC_XY || 'sensor/xy_md02',
-  topicBSK: MQTT_TOPIC_BSK || 'sensor/bsk_ec100',
+  topicXY: MQTT_TOPIC_XY || 'sensor/xy-md02',
+  topicBSK: MQTT_TOPIC_BSK || 'sensor/bsk-ec100',
+};
+
+export const API_CONFIG = {
+  baseUrl: API_URL || 'http://45.39.198.19:8000',
+  timeout: 10000,
 };
 
 export const INFLUX_CONFIG = {
@@ -61,8 +70,8 @@ export const SENSOR_THRESHOLDS = {
 
 // Default Users
 export const USERS: Record<string, { password: string; role: string; name: string }> = {
-  admin: { password: 'admin123', role: 'admin', name: 'Administrator' },
-  magang: { password: 'magang123', role: 'user', name: 'Magang' },
+  admin: { password: ADMIN_PASSWORD || 'admin123', role: 'admin', name: 'Administrator' },
+  magang: { password: MAGANG_PASSWORD || 'magang123', role: 'user', name: 'Magang' },
 };
 
 import { Appearance } from 'react-native';

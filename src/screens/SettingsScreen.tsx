@@ -169,10 +169,10 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ user, connectionStatus,
           <Text style={styles.sectionLabel}>TENTANG</Text>
           <View style={styles.card}>
             <InfoRow label="Aplikasi" value="AgriSense Mobile" />
-            <InfoRow label="Versi" value="1.0.0" />
+            <InfoRow label="Versi" value="Prototype" />
             <InfoRow label="Framework" value="React Native 0.84" />
             <InfoRow label="Protokol" value="MQTT over WSS" />
-            <InfoRow label="Pengembang" value="Dewa Dharma" last />
+            <InfoRow label="Pengembang" value="Bima Sakti Sanjaya" last />
           </View>
         </View>
 
@@ -182,7 +182,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ user, connectionStatus,
             <Text style={styles.sectionLabel}>EKSPOR DATA</Text>
             <View style={styles.card}>
               <TouchableOpacity style={styles.actionRow} onPress={handleExportCSV}>
-                <Text style={styles.actionText}>📄 Export Riwayat Sensor (CSV / Teks)</Text>
+                <Text style={styles.actionText}>Export Riwayat Sensor (CSV / Teks)</Text>
               </TouchableOpacity>
             </View>
           </View>
