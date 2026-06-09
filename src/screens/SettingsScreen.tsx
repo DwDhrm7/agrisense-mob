@@ -222,30 +222,34 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ user, connectionStatus,
         </View>
 
         {/* ── Koneksi ── */}
-        <View style={styles.section}>
-          <Text style={styles.sectionLabel}>KONEKSI</Text>
-          <View style={styles.card}>
-            <InfoRow label="Status" value={connectionStatus} valueColor={connectionStatus === 'Terhubung' ? COLORS.primary : COLORS.error} />
-            <InfoRow label="Broker" value={MQTT_CONFIG.host.split('.')[0] + '...'} />
-            <InfoRow label="Port" value={`${MQTT_CONFIG.port} (WSS)`} />
-            <InfoRow label="Topic XY" value={MQTT_CONFIG.topicXY} />
-            <InfoRow label="Topic BSK" value={MQTT_CONFIG.topicBSK} />
-            <View style={styles.divider} />
-            <InfoRow label="InfluxDB" value={INFLUX_CONFIG.host} />
-            <InfoRow label="Database" value={INFLUX_CONFIG.db} last />
+        {isAdmin && (
+          <View style={styles.section}>
+            <Text style={styles.sectionLabel}>KONEKSI</Text>
+            <View style={styles.card}>
+              <InfoRow label="Status" value={connectionStatus} valueColor={connectionStatus === 'Terhubung' ? COLORS.primary : COLORS.error} />
+              <InfoRow label="Broker" value={MQTT_CONFIG.host.split('.')[0] + '...'} />
+              <InfoRow label="Port" value={`${MQTT_CONFIG.port} (WSS)`} />
+              <InfoRow label="Topic XY" value={MQTT_CONFIG.topicXY} />
+              <InfoRow label="Topic BSK" value={MQTT_CONFIG.topicBSK} />
+              <View style={styles.divider} />
+              <InfoRow label="InfluxDB" value={INFLUX_CONFIG.host} />
+              <InfoRow label="Database" value={INFLUX_CONFIG.db} last />
+            </View>
           </View>
-        </View>
+        )}
 
         {/* ── Lokasi & Cuaca ── */}
-        <View style={styles.section}>
-          <Text style={styles.sectionLabel}>LOKASI</Text>
-          <View style={styles.card}>
-            <InfoRow label="Kota" value={OPENMETEO_CONFIG.city} />
-            <InfoRow label="Koordinat" value={`${OPENMETEO_CONFIG.latitude}, ${OPENMETEO_CONFIG.longitude}`} />
-            <InfoRow label="Timezone" value={OPENMETEO_CONFIG.timezone} />
-            <InfoRow label="Cuaca API" value="Open-Meteo (Aktif)" valueColor={COLORS.primary} last />
+        {isAdmin && (
+          <View style={styles.section}>
+            <Text style={styles.sectionLabel}>LOKASI</Text>
+            <View style={styles.card}>
+              <InfoRow label="Kota" value={OPENMETEO_CONFIG.city} />
+              <InfoRow label="Koordinat" value={`${OPENMETEO_CONFIG.latitude}, ${OPENMETEO_CONFIG.longitude}`} />
+              <InfoRow label="Timezone" value={OPENMETEO_CONFIG.timezone} />
+              <InfoRow label="Cuaca API" value="Open-Meteo (Aktif)" valueColor={COLORS.primary} last />
+            </View>
           </View>
-        </View>
+        )}
 
         {/* ── Ambang Batas ── */}
         {isAdmin && (
