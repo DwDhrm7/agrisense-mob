@@ -390,8 +390,6 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ user, connectionStatus,
           <View style={styles.card}>
             <InfoRow label="Aplikasi" value="AgriSense Mobile" />
             <InfoRow label="Versi" value="Prototype" />
-            <InfoRow label="Framework" value="React Native 0.84" />
-            <InfoRow label="Protokol" value="MQTT over WSS" />
             <InfoRow label="Pengembang" value="Bima Sakti Sanjaya" last />
           </View>
         </View>
