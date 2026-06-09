@@ -32,6 +32,64 @@ class DataStore {
   private logs: LogEntry[] = [];
   private listeners: Set<() => void> = new Set();
   private logListeners: Set<() => void> = new Set();
+  private userListeners: Set<() => void> = new Set();
+
+  private users: Record<string, { password: string; role: string; name: string; greenhouses: string[] }> = {
+    admin: { password: 'admin123', role: 'admin', name: 'Administrator', greenhouses: ['A', 'B', 'C'] },
+    magang: { password: 'magang123', role: 'user', name: 'Magang', greenhouses: ['A'] },
+  };
+
+  // ─── Users ──────────────────────────────────
+
+  getUsers() {
+    return { ...this.users };
+  }
+
+  addUser(username: string, user: { password: string; role: string; name: string; greenhouses?: string[] }) {
+    this.users[username] = { ...user, greenhouses: user.greenhouses || ['A'] };
+    this._notifyUsers();
+  }
+
+  updateUser(username: string, user: { password: string; role: string; name: string; greenhouses?: string[] }) {
+    if (this.users[username]) {
+      this.users[username] = { ...this.users[username], ...user, greenhouses: user.greenhouses || this.users[username].greenhouses };
+      this._notifyUsers();
+    }
+  }
+
+  removeUser(username: string) {
+    if (username !== 'admin') { // Prevent deleting default admin
+      delete this.users[username];
+      this._notifyUsers();
+    }
+  }
+
+  onUsersChange(fn: () => void): () => void {
+    this.userListeners.add(fn);
+    return () => { this.userListeners.delete(fn); };
+  }
+
+  private _notifyUsers() {
+    this.userListeners.forEach(fn => fn());
+  }
+
+  private offsets = {
+    suhu: 0,
+    kelembapan: 0,
+    ec: 0,
+    tds: 0,
+    suhuAir: 0,
+  };
+
+  // ─── Offsets ────────────────────────────────
+
+  getOffsets() {
+    return { ...this.offsets };
+  }
+
+  setOffsets(newOffsets: Partial<typeof this.offsets>) {
+    this.offsets = { ...this.offsets, ...newOffsets };
+  }
 
   // ─── History ────────────────────────────────
 

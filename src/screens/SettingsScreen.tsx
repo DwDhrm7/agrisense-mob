@@ -6,10 +6,9 @@ import {
   View, Text, ScrollView, StyleSheet, TouchableOpacity,
   TextInput, Alert, Share, Switch,
 } from 'react-native';
-import { MQTT_CONFIG, SENSOR_THRESHOLDS, OPENMETEO_CONFIG, INFLUX_CONFIG, TELEGRAM_CONFIG } from '../utils/config';
+import { MQTT_CONFIG, SENSOR_THRESHOLDS, OPENMETEO_CONFIG, INFLUX_CONFIG } from '../utils/config';
 import { useTheme } from '../utils/theme';
 import DataStore from '../services/DataStore';
-import MqttService from '../services/MqttService';
 import type { ConnectionStatus } from '../services/MqttService';
 
 interface SettingsScreenProps {
@@ -23,10 +22,31 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ user, connectionStatus,
   const styles = typeof getStyles !== "undefined" ? getStyles(COLORS) : {} as any;
 
   const [thresholds, setThresholds] = useState({ ...SENSOR_THRESHOLDS });
-  const [telegramConf, setTelegramConf] = useState({ ...TELEGRAM_CONFIG });
   const [editing, setEditing] = useState(false);
-  const [editingTg, setEditingTg] = useState(false);
+  
+  const [offsets, setOffsets] = useState(DataStore.getOffsets());
+  const [editingOffsets, setEditingOffsets] = useState(false);
+
+  const [users, setUsers] = useState(DataStore.getUsers());
+  const [showAddUser, setShowAddUser] = useState(false);
+  const [newUsername, setNewUsername] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [newName, setNewName] = useState('');
+  const [newGreenhouses, setNewGreenhouses] = useState('A');
+  
+  const [editingProfile, setEditingProfile] = useState(false);
+  const [editName, setEditName] = useState(user?.name || '');
+  const [editPassword, setEditPassword] = useState(user?.password || '');
+  
   const isAdmin = user?.role === 'admin';
+
+  // Listen to users change
+  React.useEffect(() => {
+    const unsub = DataStore.onUsersChange(() => {
+      setUsers(DataStore.getUsers());
+    });
+    return unsub;
+  }, []);
 
   const handleExportCSV = async () => {
     const data = DataStore.getHistory();
@@ -61,6 +81,69 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ user, connectionStatus,
     setEditing(false);
   };
 
+  const handleSaveOffsets = () => {
+    DataStore.setOffsets(offsets);
+    setEditingOffsets(false);
+    Alert.alert('Berhasil', 'Kalibrasi offset telah disimpan.');
+  };
+
+  const handleCancelOffsets = () => {
+    setOffsets(DataStore.getOffsets());
+    setEditingOffsets(false);
+  };
+
+  const updateOffset = (key: string, value: string) => {
+    const num = parseFloat(value);
+    setOffsets(prev => ({ ...prev, [key]: isNaN(num) ? 0 : num }));
+  };
+
+  const handleAddUser = () => {
+    if (!newUsername || !newPassword || !newName) {
+      Alert.alert('Gagal', 'Semua field harus diisi.');
+      return;
+    }
+    if (users[newUsername.toLowerCase()]) {
+      Alert.alert('Gagal', 'Username sudah ada.');
+      return;
+    }
+    DataStore.addUser(newUsername.toLowerCase(), {
+      password: newPassword,
+      name: newName,
+      role: 'user',
+      greenhouses: newGreenhouses.split(',').map(g => g.trim().toUpperCase()),
+    });
+    setShowAddUser(false);
+    setNewUsername('');
+    setNewPassword('');
+    setNewName('');
+    setNewGreenhouses('A');
+    Alert.alert('Berhasil', 'Pengguna baru telah ditambahkan.');
+  };
+
+  const handleRemoveUser = (u: string) => {
+    Alert.alert('Hapus Pengguna', `Apakah Anda yakin ingin menghapus pengguna '${u}'?`, [
+      { text: 'Batal', style: 'cancel' },
+      { text: 'Hapus', style: 'destructive', onPress: () => DataStore.removeUser(u) },
+    ]);
+  };
+
+  const handleSaveProfile = () => {
+    DataStore.updateUser(user.username, {
+      name: editName,
+      password: editPassword,
+      role: user.role,
+      greenhouses: user.greenhouses,
+    });
+    setEditingProfile(false);
+    Alert.alert('Berhasil', 'Profil Anda telah diperbarui. Perubahan nama akan sepenuhnya terlihat pada login berikutnya.');
+  };
+
+  const handleCancelProfile = () => {
+    setEditName(user?.name || '');
+    setEditPassword(user?.password || '');
+    setEditingProfile(false);
+  };
+
   const updateThreshold = (key: string, field: 'min' | 'max', value: string) => {
     const num = parseFloat(value);
     if (isNaN(num)) return;
@@ -81,7 +164,23 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ user, connectionStatus,
 
         {/* ── Profil ── */}
         <View style={styles.section}>
-          <Text style={styles.sectionLabel}>PROFIL</Text>
+          <View style={styles.sectionHeaderRow}>
+            <Text style={styles.sectionLabel}>PROFIL</Text>
+            {!editingProfile ? (
+              <TouchableOpacity onPress={() => setEditingProfile(true)} activeOpacity={0.6}>
+                <Text style={styles.editLink}>Edit</Text>
+              </TouchableOpacity>
+            ) : (
+              <View style={styles.actionLinksRow}>
+                <TouchableOpacity onPress={handleCancelProfile} activeOpacity={0.6}>
+                  <Text style={styles.cancelLink}>Batal</Text>
+                </TouchableOpacity>
+                <TouchableOpacity onPress={handleSaveProfile} activeOpacity={0.6}>
+                  <Text style={styles.saveLink}>Simpan</Text>
+                </TouchableOpacity>
+              </View>
+            )}
+          </View>
           <View style={styles.card}>
             <View style={styles.profileRow}>
               <View style={styles.profileAvatar}>
@@ -92,8 +191,30 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ user, connectionStatus,
                 <Text style={styles.profileRole}>
                   {isAdmin ? 'Administrator' : 'Pengguna'} · @{user?.username}
                 </Text>
+                <Text style={styles.profileRole}>
+                  Akses GH: {user?.greenhouses?.join(', ') || 'A'}
+                </Text>
               </View>
             </View>
+            
+            {editingProfile && (
+              <View style={{ paddingHorizontal: 24, paddingBottom: 24 }}>
+                <Text style={styles.label}>NAMA LENGKAP</Text>
+                <TextInput
+                  style={[styles.inputField, { marginBottom: 12 }]}
+                  value={editName}
+                  onChangeText={setEditName}
+                />
+                <Text style={styles.label}>PASSWORD</Text>
+                <TextInput
+                  style={styles.inputField}
+                  value={editPassword}
+                  onChangeText={setEditPassword}
+                  secureTextEntry
+                />
+              </View>
+            )}
+
             <TouchableOpacity style={styles.logoutRow} onPress={onLogout} activeOpacity={0.6}>
               <Text style={styles.logoutText}>Keluar dari akun</Text>
             </TouchableOpacity>
@@ -136,7 +257,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ user, connectionStatus,
                   <Text style={styles.editLink}>Edit</Text>
                 </TouchableOpacity>
               ) : (
-                <View style={{ flexDirection: 'row', gap: 12 }}>
+                <View style={styles.actionLinksRow}>
                   <TouchableOpacity onPress={handleCancel} activeOpacity={0.6}>
                     <Text style={styles.cancelLink}>Batal</Text>
                   </TouchableOpacity>
@@ -159,6 +280,101 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ user, connectionStatus,
                   onMaxChange={(v) => updateThreshold(key, 'max', v)}
                   last={i === arr.length - 1}
                 />
+              ))}
+            </View>
+          </View>
+        )}
+
+        {/* ── Kalibrasi Sensor ── */}
+        {isAdmin && (
+          <View style={styles.section}>
+            <View style={styles.sectionHeaderRow}>
+              <Text style={styles.sectionLabel}>KALIBRASI SENSOR (OFFSET)</Text>
+              {!editingOffsets ? (
+                <TouchableOpacity onPress={() => setEditingOffsets(true)} activeOpacity={0.6}>
+                  <Text style={styles.editLink}>Edit</Text>
+                </TouchableOpacity>
+              ) : (
+                <View style={styles.actionLinksRow}>
+                  <TouchableOpacity onPress={handleCancelOffsets} activeOpacity={0.6}>
+                    <Text style={styles.cancelLink}>Batal</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity onPress={handleSaveOffsets} activeOpacity={0.6}>
+                    <Text style={styles.saveLink}>Simpan</Text>
+                  </TouchableOpacity>
+                </View>
+              )}
+            </View>
+            <View style={styles.card}>
+              <OffsetRow label="Suhu Udara" unit="°C" value={offsets.suhu} editing={editingOffsets} onChange={(v) => updateOffset('suhu', v)} />
+              <OffsetRow label="Kelembapan" unit="%" value={offsets.kelembapan} editing={editingOffsets} onChange={(v) => updateOffset('kelembapan', v)} />
+              <OffsetRow label="Suhu Air" unit="°C" value={offsets.suhuAir} editing={editingOffsets} onChange={(v) => updateOffset('suhuAir', v)} />
+              <OffsetRow label="EC" unit="µS/cm" value={offsets.ec} editing={editingOffsets} onChange={(v) => updateOffset('ec', v)} />
+              <OffsetRow label="TDS" unit="ppm" value={offsets.tds} editing={editingOffsets} onChange={(v) => updateOffset('tds', v)} last />
+            </View>
+          </View>
+        )}
+
+        {/* ── Manajemen User ── */}
+        {isAdmin && (
+          <View style={styles.section}>
+            <View style={styles.sectionHeaderRow}>
+              <Text style={styles.sectionLabel}>MANAJEMEN PENGGUNA</Text>
+              <TouchableOpacity onPress={() => setShowAddUser(!showAddUser)} activeOpacity={0.6}>
+                <Text style={styles.editLink}>{showAddUser ? 'Tutup' : 'Tambah'}</Text>
+              </TouchableOpacity>
+            </View>
+            
+            {showAddUser && (
+              <View style={[styles.card, { marginBottom: 16 }]}>
+                <View style={{ padding: 20 }}>
+                  <Text style={styles.actionText}>Tambah Pengguna Baru</Text>
+                  <TextInput
+                    style={[styles.inputField, { marginTop: 12 }]}
+                    placeholder="Nama Lengkap"
+                    value={newName}
+                    onChangeText={setNewName}
+                  />
+                  <TextInput
+                    style={[styles.inputField, { marginTop: 8 }]}
+                    placeholder="Username (huruf kecil)"
+                    autoCapitalize="none"
+                    value={newUsername}
+                    onChangeText={setNewUsername}
+                  />
+                  <TextInput
+                    style={[styles.inputField, { marginTop: 8 }]}
+                    placeholder="Password"
+                    secureTextEntry
+                    value={newPassword}
+                    onChangeText={setNewPassword}
+                  />
+                  <TextInput
+                    style={[styles.inputField, { marginTop: 8 }]}
+                    placeholder="Greenhouse Akses (contoh: A, B)"
+                    value={newGreenhouses}
+                    onChangeText={setNewGreenhouses}
+                  />
+                  <TouchableOpacity style={[styles.actionRow, { marginTop: 16, borderRadius: 12 }]} onPress={handleAddUser}>
+                    <Text style={styles.actionText}>Simpan Pengguna</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            )}
+
+            <View style={styles.card}>
+              {Object.entries(users).map(([u, d], i, arr) => (
+                <View key={u} style={[styles.profileRow, { padding: 16 }, i < arr.length - 1 && { borderBottomWidth: 1, borderBottomColor: COLORS.borderLight }]}>
+                  <View style={{ flex: 1 }}>
+                    <Text style={[styles.profileName, { fontSize: 16 }]}>{d.name}</Text>
+                    <Text style={styles.profileRole}>@{u} · {d.role} · GH: {d.greenhouses?.join(', ') || 'A'}</Text>
+                  </View>
+                  {u !== 'admin' && (
+                    <TouchableOpacity onPress={() => handleRemoveUser(u)} style={{ padding: 8, backgroundColor: COLORS.errorSoft, borderRadius: 8 }}>
+                      <Text style={{ color: COLORS.error, fontSize: 12, fontFamily: 'Inter-Bold' }}>Hapus</Text>
+                    </TouchableOpacity>
+                  )}
+                </View>
               ))}
             </View>
           </View>
@@ -188,73 +404,6 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ user, connectionStatus,
           </View>
         )}
 
-        {/* ── Notifikasi Telegram ── */}
-        <View style={styles.section}>
-          <View style={styles.sectionHeaderRow}>
-            <Text style={styles.sectionLabel}>NOTIFIKASI TELEGRAM</Text>
-            {isAdmin && (!editingTg ? (
-              <TouchableOpacity onPress={() => setEditingTg(true)} activeOpacity={0.6}>
-                <Text style={styles.editLink}>Edit</Text>
-              </TouchableOpacity>
-            ) : (
-              <View style={{ flexDirection: 'row', gap: 12 }}>
-                <TouchableOpacity onPress={() => { setTelegramConf({...TELEGRAM_CONFIG}); setEditingTg(false); }} activeOpacity={0.6}>
-                  <Text style={styles.cancelLink}>Batal</Text>
-                </TouchableOpacity>
-                <TouchableOpacity onPress={() => { Object.assign(TELEGRAM_CONFIG, telegramConf); setEditingTg(false); Alert.alert('Tersimpan', 'Konfigurasi Telegram diperbarui.'); }} activeOpacity={0.6}>
-                  <Text style={styles.saveLink}>Simpan</Text>
-                </TouchableOpacity>
-              </View>
-            ))}
-          </View>
-          <View style={styles.card}>
-            <View style={[getInfoStyles(COLORS).row, isAdmin && getInfoStyles(COLORS).rowBorder]}>
-              <Text style={getInfoStyles(COLORS).label}>Status Notifikasi</Text>
-              {isAdmin && editingTg ? (
-                <Switch
-                  value={telegramConf.enabled}
-                  onValueChange={(val) => setTelegramConf(p => ({ ...p, enabled: val }))}
-                  trackColor={{ false: COLORS.borderLight, true: 'rgba(39, 174, 96, 0.4)' }}
-                  thumbColor={telegramConf.enabled ? COLORS.success : COLORS.textMuted}
-                  ios_backgroundColor={COLORS.borderLight}
-                  style={{ transform: [{ scale: 0.8 }] }}
-                />
-              ) : (
-                <View style={{
-                  backgroundColor: telegramConf.enabled ? COLORS.primarySoft : COLORS.errorSoft,
-                  paddingHorizontal: 10, paddingVertical: 4, borderRadius: 6
-                }}>
-                  <Text style={{
-                    fontSize: 10, fontFamily: 'Inter-SemiBold', 
-                    color: telegramConf.enabled ? COLORS.primary : COLORS.error,
-                    letterSpacing: 0.5, textTransform: 'uppercase'
-                  }}>
-                    {telegramConf.enabled ? 'AKTIF' : 'NONAKTIF'}
-                  </Text>
-                </View>
-              )}
-            </View>
-            {isAdmin && (
-              <View style={getThrStyles(COLORS).row}>
-                <Text style={getThrStyles(COLORS).label}>Bot Token</Text>
-                <TextInput
-                  style={[getThrStyles(COLORS).input, { marginTop: 8 }, !editingTg && getThrStyles(COLORS).inputDisabled]}
-                  value={telegramConf.botToken}
-                  onChangeText={(val) => setTelegramConf(prev => ({ ...prev, botToken: val }))}
-                  editable={editingTg}
-                  secureTextEntry={!editingTg}
-                />
-                <Text style={[getThrStyles(COLORS).label, { marginTop: 12 }]}>Chat ID Target</Text>
-                <TextInput
-                  style={[getThrStyles(COLORS).input, { marginTop: 8 }, !editingTg && getThrStyles(COLORS).inputDisabled]}
-                  value={telegramConf.chatId}
-                  onChangeText={(val) => setTelegramConf(prev => ({ ...prev, chatId: val }))}
-                  editable={editingTg}
-                />
-              </View>
-            )}
-          </View>
-        </View>
 
         {/* ── Pengembangan ── */}
         <View style={styles.section}>
@@ -264,7 +413,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ user, connectionStatus,
           </View>
         </View>
 
-        <View style={{ height: 40 }} />
+        <View style={styles.bottomSpacer} />
       </ScrollView>
     </View>
   );
@@ -325,6 +474,35 @@ const ThresholdRow = ({ label, unit, min, max, editing, onMinChange, onMaxChange
 );
 };
 
+const OffsetRow = ({ label, unit, value, editing, onChange, last }: {
+  label: string; unit: string; value: number; editing: boolean;
+  onChange: (v: string) => void; last?: boolean;
+}) => {
+  const COLORS = useTheme();
+  const thrStyles = getThrStyles(COLORS);
+  return (
+    <View style={[thrStyles.row, !last && thrStyles.rowBorder]}>
+      <View style={thrStyles.labelRow}>
+        <Text style={thrStyles.label}>{label}</Text>
+        <Text style={thrStyles.unit}>{unit}</Text>
+      </View>
+      <View style={thrStyles.inputRow}>
+        <View style={thrStyles.inputGroup}>
+          <Text style={thrStyles.inputLabel}>Offset (+/-)</Text>
+          <TextInput
+            style={[thrStyles.input, !editing && thrStyles.inputDisabled]}
+            value={value === 0 ? '' : String(value)}
+            placeholder="0"
+            onChangeText={onChange}
+            editable={editing}
+            keyboardType="numbers-and-punctuation"
+          />
+        </View>
+      </View>
+    </View>
+  );
+};
+
 const FutureRow = ({ title, desc, last }: { title: string; desc: string; last?: boolean }) => {
   const COLORS = useTheme();
   const futStyles = getFutStyles(COLORS);
@@ -370,6 +548,10 @@ const getStyles = (COLORS: any) => StyleSheet.create({
     flexDirection: 'row', justifyContent: 'space-between',
     alignItems: 'center', marginBottom: 18,
   },
+  actionLinksRow: {
+    flexDirection: 'row',
+    gap: 12,
+  },
   editLink: { fontSize: 13, fontFamily: 'Inter-Bold', color: COLORS.textPrimary, backgroundColor: COLORS.surfaceElevated, paddingHorizontal: 14, paddingVertical: 8, borderRadius: 12, borderWidth: 1, borderColor: COLORS.glassBorder },
   cancelLink: { fontSize: 13, fontFamily: 'Inter-Bold', color: COLORS.textMuted, paddingHorizontal: 14, paddingVertical: 8 },
   saveLink: { fontSize: 13, fontFamily: 'Inter-Bold', color: COLORS.textPrimary, backgroundColor: COLORS.surfaceElevated, paddingHorizontal: 14, paddingVertical: 8, borderRadius: 12, borderWidth: 1, borderColor: COLORS.glassBorder },
@@ -402,10 +584,9 @@ const getStyles = (COLORS: any) => StyleSheet.create({
   profileRole: { fontSize: 13, fontFamily: 'Inter-Medium', color: COLORS.textMuted, marginTop: 2 },
   logoutRow: {
     paddingHorizontal: 24, paddingVertical: 20,
-    borderTopWidth: 1.5, borderTopColor: COLORS.borderLight,
-    backgroundColor: COLORS.surfaceElevated,
+    backgroundColor: COLORS.errorSoft,
   },
-  logoutText: { fontSize: 15, fontFamily: 'Outfit-Bold', color: COLORS.textPrimary, textAlign: 'center', letterSpacing: 0.5 },
+  logoutText: { fontSize: 15, fontFamily: 'Outfit-Bold', color: COLORS.error, textAlign: 'center', letterSpacing: 0.5 },
 
   actionRow: {
     paddingHorizontal: 20, paddingVertical: 18,
@@ -413,6 +594,13 @@ const getStyles = (COLORS: any) => StyleSheet.create({
     backgroundColor: COLORS.primarySoft,
   },
   actionText: { fontSize: 14, fontFamily: 'Inter-Bold', color: COLORS.primary },
+  inputField: {
+    backgroundColor: COLORS.surfaceElevated, borderRadius: 12, paddingHorizontal: 16, paddingVertical: 12,
+    fontSize: 16, fontFamily: 'Outfit-Bold', color: COLORS.textPrimary, borderWidth: 1.5, borderColor: COLORS.glassBorder,
+  },
+  bottomSpacer: {
+    height: 40,
+  },
 });
 
 const getInfoStyles = (COLORS: any) => StyleSheet.create({

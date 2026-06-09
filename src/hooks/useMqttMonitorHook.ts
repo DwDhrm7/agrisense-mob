@@ -1,11 +1,21 @@
 import { useState, useEffect, useRef } from 'react';
 import MqttService, { SensorData, ConnectionStatus } from '../services/MqttService';
-import { checkThresholds, AlertItem, sendTelegramAlert } from '../services/AlertService';
+import { checkThresholds, AlertItem } from '../services/AlertService';
 import DataStore from '../services/DataStore';
+// import notifee, { AndroidImportance } from '@notifee/react-native';
 
 export const INITIAL_SENSORS: SensorData = {
   suhu: '–', kelembapan: '–', ec: '–', tds: '–', suhuAir: '–',
 };
+
+async function displayNotification(alert: AlertItem) {
+  try {
+    // Notifications disabled for testing
+    console.log('Would display notification:', alert.message);
+  } catch (err) {
+    console.error('Notification error:', err);
+  }
+}
 
 export function useMqttMonitor() {
   const [status, setStatus] = useState<ConnectionStatus>('Menginisialisasi...');
@@ -38,7 +48,17 @@ export function useMqttMonitor() {
         setLastUpdate(timeStr);
 
         setSensors(prev => {
-          const updated = { ...prev, ...data };
+          const offsets = DataStore.getOffsets();
+          
+          // Apply offsets
+          const appliedData = { ...data };
+          if (appliedData.suhu && appliedData.suhu !== '–') appliedData.suhu = (parseFloat(appliedData.suhu) + offsets.suhu).toFixed(1);
+          if (appliedData.kelembapan && appliedData.kelembapan !== '–') appliedData.kelembapan = (parseFloat(appliedData.kelembapan) + offsets.kelembapan).toFixed(1);
+          if (appliedData.ec && appliedData.ec !== '–') appliedData.ec = (parseFloat(appliedData.ec) + offsets.ec).toString();
+          if (appliedData.tds && appliedData.tds !== '–') appliedData.tds = (parseFloat(appliedData.tds) + offsets.tds).toString();
+          if (appliedData.suhuAir && appliedData.suhuAir !== '–') appliedData.suhuAir = (parseFloat(appliedData.suhuAir) + offsets.suhuAir).toFixed(1);
+
+          const updated = { ...prev, ...appliedData };
 
           // Push history
           DataStore.pushHistory({
@@ -52,9 +72,9 @@ export function useMqttMonitor() {
 
           // Log data based on topic safely
           if (topic === 'xy') {
-            DataStore.addLog('success', `Suhu: ${data.suhu}°C · Kelembapan: ${data.kelembapan}%`, 'sensor');
+            DataStore.addLog('success', `Suhu: ${appliedData.suhu}°C · Kelembapan: ${appliedData.kelembapan}%`, 'sensor');
           } else if (topic === 'bsk') {
-            DataStore.addLog('success', `EC: ${data.ec} · TDS: ${data.tds} · Suhu Air: ${data.suhuAir}°C`, 'sensor');
+            DataStore.addLog('success', `EC: ${appliedData.ec} · TDS: ${appliedData.tds} · Suhu Air: ${appliedData.suhuAir}°C`, 'sensor');
           }
 
           // Check thresholds
@@ -63,7 +83,7 @@ export function useMqttMonitor() {
             setAlerts(a => [...a.slice(-4), ...newAlerts]);
             newAlerts.forEach(al => {
               DataStore.addLog(al.type === 'danger' ? 'error' : 'warning', al.message, 'alert');
-              sendTelegramAlert(`Peringatan BSK/XY:\n${al.message}`);
+              displayNotification(al);
             });
             setAlertCount(c => c + newAlerts.length);
           }
@@ -71,10 +91,11 @@ export function useMqttMonitor() {
         });
 
         if (topic === 'xy' && data.suhu && data.kelembapan) {
+          const offsets = DataStore.getOffsets();
           setHistoryXY(h => {
             const labels = [...h.labels, timeStr].slice(-8);
-            const suhu = [...h.suhu, parseFloat(data.suhu!)].slice(-8);
-            const hum = [...h.hum, parseFloat(data.kelembapan!)].slice(-8);
+            const suhu = [...h.suhu, parseFloat(data.suhu!) + offsets.suhu].slice(-8);
+            const hum = [...h.hum, parseFloat(data.kelembapan!) + offsets.kelembapan].slice(-8);
             if (labels.length < 2) {
               return { labels: ['--:--', timeStr], suhu: [0, suhu[0]], hum: [0, hum[0]] };
             }

@@ -1,13 +1,12 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import {
   View, Text, ScrollView, StyleSheet, TouchableOpacity,
-  Dimensions, RefreshControl, AppState, Switch, NativeModules, Alert, Appearance,
+  Dimensions, RefreshControl, AppState, Appearance,
   Animated
 } from 'react-native';
 import { LineChart } from 'react-native-chart-kit';
-import { LIGHT_COLORS, DARK_COLORS } from '../utils/config';
-import { useTheme, setGlobalTheme, isDarkModeGlobal } from '../utils/theme';
-import MqttService, { SensorData, ConnectionStatus } from '../services/MqttService';
+import { useTheme, setGlobalTheme } from '../utils/theme';
+import type { SensorData, ConnectionStatus } from '../services/MqttService';
 import { fetchWeather, WeatherData } from '../services/WeatherService';
 import { AlertItem } from '../services/AlertService';
 import DataStore from '../services/DataStore';
@@ -17,10 +16,12 @@ import RecommendationCard from '../components/RecommendationCard';
 import AlertBanner from '../components/AlertBanner';
 import ConnectionStatusBar from '../components/ConnectionStatusBar';
 import ActuatorControl from '../components/ActuatorControl';
+import MLService from '../services/MLService';
+import MqttService from '../services/MqttService';
 
 interface DashboardScreenProps {
-  user: any;
-  onLogout: () => void;
+  user?: any;
+  onLogout?: () => void;
   status: ConnectionStatus;
   sensors: SensorData;
   lastUpdate: string;
@@ -31,12 +32,9 @@ interface DashboardScreenProps {
 const screenWidth = Dimensions.get('window').width;
 const CHART_WIDTH = screenWidth - 48;
 
-const INITIAL_SENSORS: SensorData = {
-  suhu: '–', kelembapan: '–', ec: '–', tds: '–', suhuAir: '–',
-};
-
 const ThemeSwitch = ({ isDark, onToggle, COLORS }: any) => {
   const animValue = useRef(new Animated.Value(isDark ? 1 : 0)).current;
+  const switchStyles = getThemeSwitchStyles(COLORS);
 
   useEffect(() => {
     Animated.timing(animValue, {
@@ -58,19 +56,9 @@ const ThemeSwitch = ({ isDark, onToggle, COLORS }: any) => {
 
   return (
     <TouchableOpacity activeOpacity={0.8} onPress={() => onToggle(!isDark)}>
-      <Animated.View style={{
-        width: 50, height: 28, borderRadius: 14,
-        backgroundColor: bgColor, justifyContent: 'center',
-      }}>
-        <Animated.View style={{
-          width: 22, height: 22, borderRadius: 11,
-          backgroundColor: COLORS.background,
-          transform: [{ translateX }],
-          justifyContent: 'center', alignItems: 'center',
-          shadowColor: '#000', shadowOffset: { width: 0, height: 2 },
-          shadowOpacity: 0.15, shadowRadius: 3, elevation: 2,
-        }}>
-          <Text style={{ fontSize: 11, transform: [{ translateY: -1 }, { translateX: isDark ? 0.5 : 0 }] }}>
+      <Animated.View style={[switchStyles.track, { backgroundColor: bgColor }]}>
+        <Animated.View style={[switchStyles.thumb, { transform: [{ translateX }] }]}>
+          <Text style={[switchStyles.icon, isDark ? switchStyles.iconDark : switchStyles.iconLight]}>
             {isDark ? '🌙' : '☀️'}
           </Text>
         </Animated.View>
@@ -79,14 +67,16 @@ const ThemeSwitch = ({ isDark, onToggle, COLORS }: any) => {
   );
 };
 
-const DashboardScreen: React.FC<DashboardScreenProps> = ({ 
-  user, onLogout, status, sensors, lastUpdate, alerts, historyXY
+const DashboardScreen: React.FC<DashboardScreenProps> = ({
+  user,
+  onLogout,
+  status, sensors, lastUpdate, alerts, historyXY
 }) => {
   const [weather, setWeather] = useState<WeatherData | null>(null);
   const [weatherLoading, setWeatherLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+  const [activeGreenhouse, setActiveGreenhouse] = useState('A');
   const COLORS = useTheme();
-  const [isDarkTheme, setIsDarkTheme] = useState(isDarkModeGlobal);
   const styles = getStyles(COLORS);
   
   const appStateRef = useRef(AppState.currentState);
@@ -158,6 +148,18 @@ const DashboardScreen: React.FC<DashboardScreenProps> = ({
   };
 
   const nutrientStatus = getNutrientStatus();
+  const trends = MLService.predictTrend(DataStore.getRecentHistory(10));
+
+  const greenhouses = user?.greenhouses || ['A'];
+
+  const handleGreenhouseChange = (gh: string) => {
+    setActiveGreenhouse(gh);
+    // Asumsikan topik untuk A: sensor/xy_md02, B: sensor/xy_md02_b, C: sensor/xy_md02_c
+    const topicSuffix = gh === 'A' ? '' : `_${gh.toLowerCase()}`;
+    MqttService.updateTopics(`sensor/xy_md02${topicSuffix}`, `sensor/bsk_ec100${topicSuffix}`);
+    DataStore.clearHistory();
+    DataStore.addLog('info', `Pindah ke Greenhouse ${gh}`, 'system');
+  };
 
   return (
     <View style={styles.container}>
@@ -170,7 +172,7 @@ const DashboardScreen: React.FC<DashboardScreenProps> = ({
           <Text style={styles.headerSub}>Smart Farm Monitoring</Text>
         </View>
         <View style={styles.headerRight}>
-          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+          <View style={styles.headerRightContent}>
             <ThemeSwitch
               isDark={COLORS.isDark}
               COLORS={COLORS}
@@ -184,6 +186,33 @@ const DashboardScreen: React.FC<DashboardScreenProps> = ({
           </View>
         </View>
       </View>
+
+      {greenhouses.length > 1 && (
+        <View style={{ flexDirection: 'row', paddingHorizontal: 24, paddingTop: 16, paddingBottom: 8, backgroundColor: COLORS.surface }}>
+          {greenhouses.map((gh: string) => {
+            const isActive = activeGreenhouse === gh;
+            return (
+              <TouchableOpacity
+                key={gh}
+                onPress={() => handleGreenhouseChange(gh)}
+                style={{
+                  paddingHorizontal: 16,
+                  paddingVertical: 8,
+                  borderRadius: 20,
+                  backgroundColor: isActive ? COLORS.primary : COLORS.surfaceElevated,
+                  marginRight: 12,
+                  borderWidth: 1,
+                  borderColor: isActive ? COLORS.primary : COLORS.glassBorder,
+                }}
+              >
+                <Text style={{ fontSize: 13, fontFamily: 'Inter-Bold', color: isActive ? COLORS.background : COLORS.textPrimary }}>
+                  Greenhouse {gh}
+                </Text>
+              </TouchableOpacity>
+            );
+          })}
+        </View>
+      )}
 
       <ScrollView
         contentContainerStyle={styles.scrollContent}
@@ -212,8 +241,8 @@ const DashboardScreen: React.FC<DashboardScreenProps> = ({
             <Text style={styles.sectionTag}>XY-MD02</Text>
           </View>
           <View style={styles.grid}>
-            <SensorCard label="Suhu Udara" subtitle="Iklim Mikro" value={sensors.suhu} unit="°C" color={COLORS.suhu} sensorKey="suhu" />
-            <SensorCard label="Kelembapan" subtitle="Kerapatan Air Udara" value={sensors.kelembapan} unit="%RH" color={COLORS.kelembapan} sensorKey="kelembapan" />
+            <SensorCard label="Suhu Udara" subtitle="Iklim Mikro" value={sensors.suhu} unit="°C" color={COLORS.suhu} sensorKey="suhu" trend={trends.suhu} />
+            <SensorCard label="Kelembapan" subtitle="Kerapatan Air Udara" value={sensors.kelembapan} unit="%RH" color={COLORS.kelembapan} sensorKey="kelembapan" trend={trends.kelembapan} />
           </View>
 
           {/* Chart */}
@@ -255,10 +284,10 @@ const DashboardScreen: React.FC<DashboardScreenProps> = ({
             <Text style={styles.sectionTag}>BSK-EC-100</Text>
           </View>
           <View style={styles.grid}>
-            <SensorCard label="EC" subtitle="Kekentalan Nutrisi" value={sensors.ec} unit="µS/cm" color={COLORS.ec} sensorKey="ec" />
+            <SensorCard label="EC" subtitle="Kekentalan Nutrisi" value={sensors.ec} unit="µS/cm" color={COLORS.ec} sensorKey="ec" trend={trends.ec} />
             <SensorCard label="TDS" subtitle="Zat Padat Terlarut" value={sensors.tds} unit="ppm" color={COLORS.tds} sensorKey="tds" />
           </View>
-          <View style={[styles.grid, { marginTop: 14 }]}>
+          <View style={[styles.grid, styles.nutrientGridSecondary]}>
             <SensorCard label="Suhu Air" subtitle="Suhu Tandon" value={sensors.suhuAir} unit="°C" color={COLORS.suhuAir} sensorKey="suhuAir" />
             {/* Status overview */}
             <View style={styles.statusCard}>
@@ -272,13 +301,15 @@ const DashboardScreen: React.FC<DashboardScreenProps> = ({
         </View>
 
         {/* ── Kendali Perangkat ── */}
-        <View style={styles.section}>
-          <View style={styles.sectionHeader}>
-            <Text style={styles.sectionTitle}>Kendali Perangkat</Text>
-            <Text style={styles.sectionTag}>IOT AKTUATOR</Text>
+        {user?.role === 'admin' && (
+          <View style={styles.section}>
+            <View style={styles.sectionHeader}>
+              <Text style={styles.sectionTitle}>Kendali Perangkat</Text>
+              <Text style={styles.sectionTag}>IOT AKTUATOR</Text>
+            </View>
+            <ActuatorControl />
           </View>
-          <ActuatorControl />
-        </View>
+        )}
 
         {/* ── Rekomendasi ── */}
         <View style={styles.section}>
@@ -343,6 +374,10 @@ const getStyles = (COLORS: any) => StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 12,
+  },
+  headerRightContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   avatar: {
     width: 36,
@@ -413,6 +448,9 @@ const getStyles = (COLORS: any) => StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     gap: 14,
+  },
+  nutrientGridSecondary: {
+    marginTop: 14,
   },
 
   // ── Chart ──
@@ -517,6 +555,37 @@ const getStyles = (COLORS: any) => StyleSheet.create({
     fontSize: 10,
     marginTop: 6,
     fontFamily: 'Inter-Regular',
+  },
+});
+
+const getThemeSwitchStyles = (COLORS: any) => StyleSheet.create({
+  track: {
+    width: 50,
+    height: 28,
+    borderRadius: 14,
+    justifyContent: 'center',
+  },
+  thumb: {
+    width: 22,
+    height: 22,
+    borderRadius: 11,
+    backgroundColor: COLORS.background,
+    justifyContent: 'center',
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.15,
+    shadowRadius: 3,
+    elevation: 2,
+  },
+  icon: {
+    fontSize: 11,
+  },
+  iconLight: {
+    transform: [{ translateY: -1 }],
+  },
+  iconDark: {
+    transform: [{ translateY: -1 }, { translateX: 0.5 }],
   },
 });
 

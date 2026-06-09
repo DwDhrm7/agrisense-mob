@@ -9,8 +9,6 @@ import {
   INFLUX_DB,
   OPENMETEO_LATITUDE,
   OPENMETEO_LONGITUDE,
-  TELEGRAM_BOT_TOKEN,
-  TELEGRAM_CHAT_ID,
   GEMINI_API_KEY,
 } from '@env';
 
@@ -39,12 +37,6 @@ export const OPENMETEO_CONFIG = {
   city: 'Denpasar',
 };
 
-export const TELEGRAM_CONFIG = {
-  enabled: true,
-  botToken: TELEGRAM_BOT_TOKEN || '',
-  chatId: TELEGRAM_CHAT_ID || '',
-};
-
 export const GEMINI_CONFIG = {
   enabled: true,
   apiKey: GEMINI_API_KEY, 
@@ -59,13 +51,7 @@ export const SENSOR_THRESHOLDS = {
   suhuAir: { min: 15, max: 32, unit: '°C', label: 'Suhu Air' },
 };
 
-// Default Users
-export const USERS: Record<string, { password: string; role: string; name: string }> = {
-  admin: { password: 'admin123', role: 'admin', name: 'Administrator' },
-  magang: { password: 'magang123', role: 'user', name: 'Magang' },
-};
 
-import { Appearance } from 'react-native';
 
 export const LIGHT_COLORS = {
   // Core palette — Earthy Tone Liquid Apple

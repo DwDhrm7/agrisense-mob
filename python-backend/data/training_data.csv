@@ -1,0 +1,46 @@
+timestamp,suhu,kelembapan,ec,tds,suhuAir,crop,outcome,growthDays,notes
+2024-06-01T08:30:00,22.5,68,1200,600,21.0,selada,success,35,Optimal conditions
+2024-06-01T09:15:00,23.0,70,1250,625,21.5,selada,success,35,Slightly elevated EC
+2024-06-01T10:00:00,25.0,65,1100,550,22.0,bayam,success,28,Good growth rate
+2024-06-01T11:30:00,26.5,62,950,475,23.0,pakcoy,success,28,Faster than expected
+2024-06-01T12:45:00,28.0,60,1300,650,24.5,kangkung,success,25,Excellent
+2024-06-01T14:00:00,29.5,58,1400,700,25.0,cabai,partial,90,Need more sunlight
+2024-06-01T15:30:00,31.0,55,1600,800,26.5,tomat,success,60,Cherry variety
+2024-06-01T16:45:00,32.0,52,1500,750,27.0,terong,success,70,Good color development
+2024-06-01T18:00:00,30.5,65,1200,600,25.5,mentimun,success,45,Vigorous growth
+2024-06-02T08:30:00,20.0,75,1100,550,19.5,seledri,success,70,Cool morning
+2024-06-02T09:15:00,19.5,78,1050,525,19.0,stroberi,success,120,Compact growth
+2024-06-02T10:00:00,21.0,72,1180,590,20.5,selada,success,35,Healthy leaves
+2024-06-02T11:30:00,24.0,68,1220,610,21.8,bayam,success,28,Vibrant color
+2024-06-02T12:45:00,26.5,64,1300,650,23.0,sawi,success,32,Growth on track
+2024-06-02T14:00:00,28.5,60,1450,725,24.5,cabai,success,90,Flowering stage
+2024-06-02T15:30:00,30.0,58,1550,775,25.8,kemangi,success,30,Aromatic leaves
+2024-06-02T16:45:00,31.5,55,1700,850,26.5,tomat,success,60,Heavy fruit set
+2024-06-02T18:00:00,29.0,62,1400,700,25.0,mentimun,success,45,Long vines
+2024-06-03T08:30:00,18.5,80,950,475,18.0,seledri,success,70,Healthy roots
+2024-06-03T09:15:00,19.0,82,920,460,18.5,stroberi,partial,120,Slugsnail damage
+2024-06-03T10:00:00,22.0,70,1200,600,21.0,kangkung,success,25,Excellent vigor
+2024-06-03T11:30:00,24.5,67,1150,575,22.0,pakcoy,success,28,Ready for harvest
+2024-06-03T12:45:00,27.0,63,1350,675,23.5,cabai,success,90,Pod setting
+2024-06-03T14:00:00,29.0,60,1500,750,25.0,terong,success,70,Purple flowers
+2024-06-03T15:30:00,31.0,56,1700,850,26.0,tomat,success,60,Ripe fruits
+2024-06-03T16:45:00,30.5,58,1600,800,25.5,mentimun,success,45,Prolific flowering
+2024-06-03T18:00:00,28.0,65,1300,650,24.0,kemangi,success,30,Harvest ready
+2024-06-04T08:30:00,21.0,74,1050,525,20.5,selada,success,35,Crisp leaves
+2024-06-04T09:15:00,22.5,71,1100,550,21.0,bayam,success,28,Robust growth
+2024-06-04T10:00:00,24.0,68,1200,600,22.5,sawi,success,32,Mature heads
+2024-06-04T11:30:00,26.0,65,1300,650,23.5,pakcoy,success,28,Ready to harvest
+2024-06-04T12:45:00,27.5,62,1400,700,24.5,kangkung,success,25,Peak condition
+2024-06-04T14:00:00,29.5,59,1550,775,25.5,cabai,partial,90,Blossom drop stress
+2024-06-04T15:30:00,31.5,56,1700,850,27.0,tomat,success,60,Fruit ripening
+2024-06-04T16:45:00,32.0,54,1800,900,27.5,terong,fail,70,Heat stress damage
+2024-06-04T18:00:00,30.0,61,1600,800,26.0,mentimun,success,45,Flowering stage
+2024-06-05T08:30:00,20.5,76,1100,550,20.0,seledri,success,70,Steady growth
+2024-06-05T09:15:00,19.5,79,1000,500,19.0,stroberi,success,120,Runner development
+2024-06-05T10:00:00,23.0,69,1250,625,22.0,selada,success,35,Transplant ready
+2024-06-05T11:30:00,25.0,66,1300,650,23.0,bayam,success,28,Early harvest possible
+2024-06-05T12:45:00,27.0,63,1350,675,24.0,sawi,success,32,Button forming
+2024-06-05T14:00:00,29.0,60,1450,725,25.5,cabai,success,90,Flowering continues
+2024-06-05T15:30:00,30.5,57,1600,800,26.5,kemangi,success,30,Aromatic peak
+2024-06-05T16:45:00,31.0,55,1700,850,27.0,tomat,success,60,Color development
+2024-06-05T18:00:00,28.5,64,1500,750,25.0,mentimun,success,45,Vine growth

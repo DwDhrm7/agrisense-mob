@@ -2,7 +2,7 @@
 // AgriSense · Tab Bar Component
 // ──────────────────────────────────────────────
 import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Animated } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import Svg, { Path } from 'react-native-svg';
 import { useTheme } from '../utils/theme';
 

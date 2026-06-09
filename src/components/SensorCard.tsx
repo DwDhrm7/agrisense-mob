@@ -13,9 +13,10 @@ interface SensorCardProps {
   unit: string;
   color: string;
   sensorKey?: keyof typeof SENSOR_THRESHOLDS;
+  trend?: 'Naik' | 'Turun' | 'Stabil' | null;
 }
 
-const SensorCard: React.FC<SensorCardProps> = ({ label, subtitle, value, unit, color, sensorKey }) => {
+const SensorCard: React.FC<SensorCardProps> = ({ label, subtitle, value, unit, color, sensorKey, trend }) => {
   const COLORS = useTheme();
   const styles = typeof getStyles !== "undefined" ? getStyles(COLORS) : {} as any;
 
@@ -55,6 +56,13 @@ const SensorCard: React.FC<SensorCardProps> = ({ label, subtitle, value, unit, c
         <Text style={[styles.value, { color }]}>{value}</Text>
         <Text style={styles.unit}>{unit}</Text>
       </View>
+      {trend && trend !== 'Stabil' && (
+        <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 4 }}>
+          <Text style={{ fontSize: 10, color: trend === 'Naik' ? COLORS.error : COLORS.success, fontFamily: 'Inter-Bold' }}>
+            {trend === 'Naik' ? '↑ Naik' : '↓ Turun'}
+          </Text>
+        </View>
+      )}
       {status !== 'normal' && (
         <View style={[styles.statusBar, status === 'danger' ? styles.statusDanger : styles.statusWarning]}>
           <Text style={[styles.statusText, status === 'danger' ? styles.dangerText : styles.warningText]}>

@@ -8,7 +8,7 @@ import LogScreen from './src/screens/LogScreen';
 import SettingsScreen from './src/screens/SettingsScreen';
 import TabBar, { TabId } from './src/components/TabBar';
 import MqttService from './src/services/MqttService';
-import { useMqttMonitor } from './src/hooks/useMqttMonitor';
+import { useMqttMonitor } from './src/hooks/useMqttMonitorHook';
 import { useTheme } from './src/utils/theme';
 
 // Polyfill for Paho MQTT which attempts to access localStorage

@@ -1,6 +1,10 @@
 pluginManagement { includeBuild("../node_modules/@react-native/gradle-plugin") }
 plugins { id("com.facebook.react.settings") }
-extensions.configure(com.facebook.react.ReactSettingsExtension){ ex -> ex.autolinkLibrariesFromCommand() }
+
+reactSettings {
+    it.autolinkLibrariesFromCommand()
+}
+
 rootProject.name = 'agrisense-mobile'
 include ':app'
 includeBuild('../node_modules/@react-native/gradle-plugin')

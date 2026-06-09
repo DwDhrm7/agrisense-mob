@@ -58,7 +58,7 @@ Penting: Berikan balasan STRICTLY dalam format JSON menggunakan struktur di bawa
       // Clean up markdown blocks if the model includes them
       const jsonStr = resultText.replace(/```json|```/g, '').trim();
       return JSON.parse(jsonStr) as AIRecommendation;
-    } catch (e) {
+    } catch {
       console.error('Gagal parsing JSON dari Gemini:', resultText);
       throw new Error('Format balasan Gemini tidak valid JSON.');
     }

@@ -1,7 +1,7 @@
 // ──────────────────────────────────────────────
 // AgriSense · Alert / Notification Service
 // ──────────────────────────────────────────────
-import { SENSOR_THRESHOLDS, TELEGRAM_CONFIG } from '../utils/config';
+import { SENSOR_THRESHOLDS } from '../utils/config';
 import type { SensorData } from './MqttService';
 
 export interface AlertItem {
@@ -10,11 +10,20 @@ export interface AlertItem {
   sensor: string;
   message: string;
   value: string;
+  sop?: string;
   timestamp: Date;
 }
 
 const alertCooldowns: Record<string, number> = {};
 const COOLDOWN_MS = 60_000; // 1 menit cooldown per sensor
+
+function getSop(key: string, type: 'low' | 'high'): string {
+  if (key === 'suhu') return type === 'high' ? 'SOP: Nyalakan kipas sirkulasi / exhaust.' : 'SOP: Kurangi ventilasi udara luar.';
+  if (key === 'kelembapan') return type === 'high' ? 'SOP: Nyalakan kipas exhaust untuk mengurangi kelembapan.' : 'SOP: Nyalakan misting / siram lantai greenhouse.';
+  if (key === 'ec' || key === 'tds') return type === 'high' ? 'SOP: Tambahkan air baku ke tandon untuk mengencerkan.' : 'SOP: Tambahkan pekatan nutrisi AB Mix ke tandon.';
+  if (key === 'suhuAir') return type === 'high' ? 'SOP: Sirkulasikan air tandon atau tambahkan air segar.' : 'SOP: Pastikan suhu tandon tidak membeku.';
+  return 'SOP: Periksa kondisi fisik di lapangan.';
+}
 
 export function checkThresholds(sensors: SensorData): AlertItem[] {
   const alerts: AlertItem[] = [];
@@ -46,6 +55,7 @@ export function checkThresholds(sensors: SensorData): AlertItem[] {
         sensor: threshold.label,
         message: `${threshold.label} terlalu rendah: ${val}${threshold.unit} (min: ${threshold.min}${threshold.unit})`,
         value: `${val}${threshold.unit}`,
+        sop: getSop(key, 'low'),
         timestamp: new Date(),
       });
     } else if (val > threshold.max) {
@@ -56,6 +66,7 @@ export function checkThresholds(sensors: SensorData): AlertItem[] {
         sensor: threshold.label,
         message: `${threshold.label} terlalu tinggi: ${val}${threshold.unit} (max: ${threshold.max}${threshold.unit})`,
         value: `${val}${threshold.unit}`,
+        sop: getSop(key, 'high'),
         timestamp: new Date(),
       });
     }
@@ -64,23 +75,3 @@ export function checkThresholds(sensors: SensorData): AlertItem[] {
   return alerts;
 }
 
-export async function sendTelegramAlert(message: string): Promise<boolean> {
-  if (!TELEGRAM_CONFIG.enabled) return false;
-  if (TELEGRAM_CONFIG.botToken === 'YOUR_TELEGRAM_BOT_TOKEN') return false;
-
-  try {
-    const url = `https://api.telegram.org/bot${TELEGRAM_CONFIG.botToken}/sendMessage`;
-    const res = await fetch(url, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        chat_id: TELEGRAM_CONFIG.chatId,
-        text: `🌿 *AgriSense Alert*\n\n${message}`,
-        parse_mode: 'Markdown',
-      }),
-    });
-    return res.ok;
-  } catch {
-    return false;
-  }
-}

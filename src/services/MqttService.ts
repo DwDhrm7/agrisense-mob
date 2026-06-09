@@ -22,6 +22,8 @@ class MqttService {
   private onStatusChange: StatusCallback | null = null;
   private reconnectTimer: ReturnType<typeof setTimeout> | null = null;
   private isConnected = false;
+  private currentTopicXY = MQTT_CONFIG.topicXY;
+  private currentTopicBSK = MQTT_CONFIG.topicBSK;
   
   // Try multiple configurations (like Astro version)
   private brokerVariants: { host: string; port: number; path: string }[] = [];
@@ -84,7 +86,7 @@ class MqttService {
           this.onStatusChange?.('Terhubung');
 
           // Subscribe (Astro logic)
-          const topics = [MQTT_CONFIG.topicXY, MQTT_CONFIG.topicBSK, 'sensor/+', 'sensor/#'];
+          const topics = [this.currentTopicXY, this.currentTopicBSK, 'sensor/+', 'sensor/#'];
           topics.forEach(t => t && this.client.subscribe(t));
           console.log('[MQTT] Subscribed to telemetry topics.');
         },
@@ -132,8 +134,8 @@ class MqttService {
       try { data = JSON.parse(raw); } catch { return; }
 
       // Flexible detection logic (matches Astro versions)
-      const isXY = topic === MQTT_CONFIG.topicXY || topic.includes('xy');
-      const isBSK = topic === MQTT_CONFIG.topicBSK || topic.includes('bsk');
+      const isXY = topic === this.currentTopicXY || topic.includes('xy');
+      const isBSK = topic === this.currentTopicBSK || topic.includes('bsk');
 
       if (isXY) {
         this._handleXYData(data, topic);
@@ -153,7 +155,7 @@ class MqttService {
     }
   }
 
-  private _handleXYData(data: any, topic: string) {
+  private _handleXYData(data: any, _topic: string) {
     const suhu = data.suhu ?? data.temperature ?? data.temp ?? null;
     const kelembapan = data.kelembapan ?? data.humidity ?? data.hum ?? null;
     const result: Partial<SensorData> = {};
@@ -164,7 +166,7 @@ class MqttService {
     }
   }
 
-  private _handleBSKData(data: any, topic: string) {
+  private _handleBSKData(data: any, _topic: string) {
     const ec = data.ec ?? data.EC ?? null;
     const tds = data.tds ?? data.TDS ?? null;
     const temp = data.temperature ?? data.temp ?? data.suhu ?? data.suhuAir ?? null;
@@ -184,6 +186,44 @@ class MqttService {
   }
 
   getConnected() { return this.isConnected; }
+
+  updateTopics(topicXY: string, topicBSK: string) {
+    if (this.currentTopicXY === topicXY && this.currentTopicBSK === topicBSK) return;
+    
+    if (this.isConnected && this.client) {
+      try {
+        this.client.unsubscribe(this.currentTopicXY);
+        this.client.unsubscribe(this.currentTopicBSK);
+        this.client.subscribe(topicXY);
+        this.client.subscribe(topicBSK);
+      } catch (e) {
+        console.warn('[MQTT] Unsubscribe/Subscribe error', e);
+      }
+    }
+    
+    this.currentTopicXY = topicXY;
+    this.currentTopicBSK = topicBSK;
+    console.log(`[MQTT] Switched topics to ${topicXY} and ${topicBSK}`);
+  }
+
+  publishControl(topic: string, state: boolean) {
+    if (!this.isConnected || !this.client) {
+      console.warn('[MQTT] Cannot publish, not connected');
+      return false;
+    }
+    try {
+      const Paho = require('paho-mqtt');
+      const payload = state ? 'ON' : 'OFF';
+      const message = new Paho.Message(payload);
+      message.destinationName = topic;
+      this.client.send(message);
+      console.log(`[MQTT] Published ${payload} to ${topic}`);
+      return true;
+    } catch (e: any) {
+      console.error('[MQTT] Publish error:', e?.message);
+      return false;
+    }
+  }
 }
 
 export default new MqttService();

@@ -5,7 +5,7 @@ import React, { useState } from 'react';
 import { View, Text, StyleSheet, Switch, TouchableOpacity, TextInput } from 'react-native';
 import { useTheme } from '../utils/theme';
 import DataStore from '../services/DataStore';
-// import MqttService from '../services/MqttService';
+import MqttService from '../services/MqttService';
 
 interface ActuatorProps {
   label: string;
@@ -16,7 +16,7 @@ interface ActuatorProps {
 
 const DAYS = ['Sn', 'Sl', 'Rb', 'Km', 'Jm', 'Sb', 'Mg'];
 
-const ActuatorItem: React.FC<ActuatorProps> = ({ label, description, initialState = false, topic }) => {
+const ActuatorItem: React.FC<ActuatorProps> = ({ label, description, initialState = false, topic: _topic }) => {
   const COLORS = useTheme();
   const styles = typeof getStyles !== "undefined" ? getStyles(COLORS) : {} as any;
 
@@ -32,6 +32,7 @@ const ActuatorItem: React.FC<ActuatorProps> = ({ label, description, initialStat
     setIsEnabled(val);
     const action = val ? 'ON' : 'OFF';
     DataStore.addLog('info', `${label} (Manual) diubah menjadi ${action}`, 'action');
+    MqttService.publishControl(_topic, val);
   };
 
   const toggleDay = (idx: number) => {
@@ -57,7 +58,7 @@ const ActuatorItem: React.FC<ActuatorProps> = ({ label, description, initialStat
             onValueChange={toggleSwitch}
             value={isEnabled}
             disabled={isAuto}
-            style={{ transform: [{ scale: 0.85 }] }}
+            style={styles.manualSwitch}
           />
         </View>
       </View>
@@ -72,11 +73,11 @@ const ActuatorItem: React.FC<ActuatorProps> = ({ label, description, initialStat
                 setIsAuto(val);
                 DataStore.addLog('info', `Otomasi ${label} ${val ? 'Diaktifkan' : 'Dimatikan'}`, 'system');
               }}
-              style={{ transform: [{ scale: 0.75 }] }}
+              style={styles.autoSwitch}
             />
           </View>
           
-          <View style={{ opacity: isAuto ? 1 : 0.4 }} pointerEvents={isAuto ? 'auto' : 'none'}>
+          <View style={isAuto ? styles.autoContentEnabled : styles.autoContentDisabled} pointerEvents={isAuto ? 'auto' : 'none'}>
             <Text style={styles.autoLabel}>HARI AKTIF</Text>
             <View style={styles.daysRow}>
               {DAYS.map((d, i) => {
@@ -187,6 +188,9 @@ const getStyles = (COLORS: any) => StyleSheet.create({
     alignItems: 'center',
     gap: 16,
   },
+  manualSwitch: {
+    transform: [{ scale: 0.85 }],
+  },
   otomasiBtn: {
     color: COLORS.textPrimary,
     fontSize: 12,
@@ -219,6 +223,15 @@ const getStyles = (COLORS: any) => StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     marginBottom: 24,
+  },
+  autoSwitch: {
+    transform: [{ scale: 0.75 }],
+  },
+  autoContentEnabled: {
+    opacity: 1,
+  },
+  autoContentDisabled: {
+    opacity: 0.4,
   },
   autoTitle: {
     color: COLORS.textPrimary,

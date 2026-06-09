@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ActivityIndicator, Alert } from 'react-native';
 import { useTheme } from '../utils/theme';
 import type { SensorData } from '../services/MqttService';
 import { getGeminiRecommendation, type AIRecommendation } from '../services/GeminiService';
+import mlService, { type CropPrediction, type MLPredictionResult } from '../services/MLService';
 
 interface Recommendation {
   title: string;
@@ -11,18 +12,15 @@ interface Recommendation {
   tips: string[];
   confidence: string;
   accentColor: string;
+  source: 'ml' | 'fallback' | 'ai';
 }
 
 interface RecommendationCardProps {
   sensors: SensorData;
 }
 
-function getRecommendation(sensors: SensorData, COLORS: any): Recommendation {
-  const s = parseFloat(sensors.suhu);
-  const h = parseFloat(sensors.kelembapan);
-  const ec = parseFloat(sensors.ec);
-
-  if (isNaN(s) || sensors.suhu === '–') {
+function getRecommendationFromML(prediction: CropPrediction[], envScore: number, COLORS: any): Recommendation {
+  if (!prediction || prediction.length === 0) {
     return {
       title: 'Menunggu Data Sensor',
       text: 'Sistem sedang mengumpulkan pembacaan lingkungan untuk memberikan rekomendasi yang akurat.',
@@ -30,88 +28,24 @@ function getRecommendation(sensors: SensorData, COLORS: any): Recommendation {
       tips: [],
       confidence: '–',
       accentColor: COLORS.textLight,
+      source: 'fallback',
     };
   }
 
-  if (s >= 20 && s <= 30 && h >= 60 && h <= 80 && !isNaN(ec) && ec > 800) {
-    return {
-      title: 'Sangat Direkomendasikan: Sayuran Daun',
-      text: `Stabilitas suhu di ${s}°C dengan kelembapan ${h}% dan EC ${ec} µS/cm. Iklim mendukung pertumbuhan sayuran daun secara optimal.`,
-      plants: [
-        { name: 'Selada (Lettuce)', detail: 'Suhu ideal 15–25°C · panen 30–45 hari' },
-        { name: 'Bayam (Spinach)', detail: 'Tumbuh cepat · panen 25–30 hari' },
-        { name: 'Kangkung', detail: 'Cocok hidroponik · panen 21–30 hari' },
-        { name: 'Sawi (Mustard Greens)', detail: 'Tahan panas ringan · 30–35 hari' },
-        { name: 'Pakcoy', detail: 'EC ideal 1000–1500 µS/cm · 25–30 hari' },
-      ],
-      tips: [
-        'Jaga EC antara 800–1500 µS/cm untuk pertumbuhan optimal.',
-        'Pastikan sirkulasi udara baik untuk mencegah jamur.',
-        'Lakukan pengecekan pH air secara berkala (pH 5.5–6.5).',
-      ],
-      confidence: 'Tinggi',
-      accentColor: COLORS.primary,
-    };
-  }
-
-  if (s > 30) {
-    return {
-      title: 'Direkomendasikan: Tanaman Tahan Panas',
-      text: `Suhu ${s}°C tergolong tinggi. Tanaman tropis dan varietas tahan panas akan tumbuh lebih baik di kondisi ini.`,
-      plants: [
-        { name: 'Cabai Rawit', detail: 'Optimal 25–35°C · tahan panas tinggi' },
-        { name: 'Tomat Cherry', detail: 'Produktivitas tinggi pada suhu hangat' },
-        { name: 'Terong', detail: 'Menyukai 25–35°C · butuh cahaya penuh' },
-        { name: 'Kemangi', detail: 'Aroma terbaik pada suhu hangat · panen cepat' },
-        { name: 'Mentimun', detail: 'Tumbuh cepat · butuh air cukup' },
-      ],
-      tips: [
-        'Tingkatkan frekuensi irigasi untuk kompensasi penguapan.',
-        'Gunakan paranet 50% jika suhu melebihi 38°C.',
-        'Monitor kelembapan — suhu tinggi percepat dehidrasi.',
-      ],
-      confidence: 'Sedang',
-      accentColor: COLORS.warning,
-    };
-  }
-
-  if (s < 20) {
-    return {
-      title: 'Direkomendasikan: Sayuran Iklim Sejuk',
-      text: `Suhu ${s}°C termasuk sejuk. Sayuran iklim sedang dan subtropis akan berproduksi optimal.`,
-      plants: [
-        { name: 'Brokoli', detail: 'Optimal 15–20°C · butuh nutrisi tinggi' },
-        { name: 'Stroberi', detail: 'Suhu ideal 15–25°C · perlu perhatian ekstra' },
-        { name: 'Kubis', detail: 'Tahan dingin · panen 60–80 hari' },
-        { name: 'Wortel', detail: 'Akar tumbuh baik di suhu sejuk' },
-        { name: 'Seledri', detail: 'Optimal 15–21°C · butuh kelembapan tinggi' },
-      ],
-      tips: [
-        'Gunakan mulsa untuk menjaga suhu tanah tetap stabil.',
-        'Pastikan drainase baik — suhu rendah memperlambat penguapan.',
-        'Kurangi pemberian nutrisi karena metabolisme melambat.',
-      ],
-      confidence: 'Sedang',
-      accentColor: COLORS.kelembapan,
-    };
-  }
+  const topCrop = prediction[0];
+  const confidence = Math.round(topCrop.confidence);
 
   return {
-    title: 'Peringatan: Kondisi Adaptif',
-    text: `Suhu ${s}°C dengan kelembapan ${h}%. Perlu pengawasan lebih ketat terhadap asupan nutrisi dan pengendalian iklim mikro.`,
-    plants: [
-      { name: 'Pakcoy', detail: 'Adaptif pada berbagai kondisi · panen cepat' },
-      { name: 'Kailan', detail: 'Toleran terhadap variasi suhu' },
-      { name: 'Selada Romaine', detail: 'Lebih tahan panas dari selada biasa' },
-      { name: 'Bayam Merah', detail: 'Antioksidan tinggi · adaptif' },
-    ],
-    tips: [
-      'Pantau fluktuasi suhu harian untuk identifikasi tren.',
-      'Sesuaikan EC berdasarkan fase pertumbuhan tanaman.',
-      'Pertimbangkan penggunaan controller suhu otomatis.',
-    ],
-    confidence: 'Rendah',
-    accentColor: COLORS.warning,
+    title: `${confidence >= 80 ? 'Sangat Direkomendasikan' : 'Direkomendasikan'}: ${topCrop.crop}`,
+    text: `Skor lingkungan: ${envScore}%. Berdasarkan kondisi sensor saat ini (suhu, kelembapan, EC, TDS, suhu air), model ML memprediksi ${topCrop.crop} sebagai tanaman optimal untuk ditanam.`,
+    plants: prediction.map((crop, i) => ({
+      name: crop.crop,
+      detail: `Confidence: ${Math.round(crop.confidence)}% · Panen: ${crop.growthDays} hari`
+    })),
+    tips: topCrop.tips,
+    confidence: `ML Model · ${confidence}%`,
+    accentColor: confidence >= 80 ? COLORS.success : (confidence >= 60 ? COLORS.warning : COLORS.error),
+    source: 'ml',
   };
 }
 
@@ -119,8 +53,49 @@ const RecommendationCard: React.FC<RecommendationCardProps> = ({ sensors }) => {
   const COLORS = useTheme();
   const styles = getStyles(COLORS);
 
+  const [mlLoading, setMlLoading] = useState(true);
+  const [mlPrediction, setMlPrediction] = useState<MLPredictionResult | null>(null);
   const [loadingAI, setLoadingAI] = useState(false);
   const [aiRec, setAiRec] = useState<AIRecommendation | null>(null);
+
+  // Initialize ML service on mount
+  useEffect(() => {
+    const initML = async () => {
+      try {
+        if (!mlService.getStatus().initialized) {
+          await mlService.init();
+        }
+        setMlLoading(false);
+      } catch (error) {
+        console.error('[RecommendationCard] ML init error:', error);
+        setMlLoading(false);
+      }
+    };
+    initML();
+
+    return () => {
+      // Cleanup if needed
+    };
+  }, []);
+
+  // Update ML predictions when sensors change
+  useEffect(() => {
+    const updatePredictions = async () => {
+      try {
+        if (!sensors.suhu || sensors.suhu === '–') {
+          setMlPrediction(null);
+          return;
+        }
+
+        const prediction = await mlService.predict(sensors);
+        setMlPrediction(prediction);
+      } catch (error) {
+        console.warn('[RecommendationCard] Prediction error:', error);
+      }
+    };
+
+    updatePredictions();
+  }, [sensors]);
 
   const fetchAI = async () => {
     try {
@@ -136,9 +111,25 @@ const RecommendationCard: React.FC<RecommendationCardProps> = ({ sensors }) => {
     }
   };
 
-  const rec = aiRec
-    ? { ...aiRec, confidence: '✨ AI Generated', accentColor: COLORS.primary }
-    : getRecommendation(sensors, COLORS);
+  // Determine which recommendation to show
+  let rec: Recommendation;
+  if (aiRec) {
+    rec = { ...aiRec, confidence: '✨ Gemini AI', accentColor: COLORS.primary, source: 'ai' };
+  } else if (mlPrediction && mlPrediction.topCrops.length > 0) {
+    rec = getRecommendationFromML(mlPrediction.topCrops, mlPrediction.environmentScore, COLORS);
+  } else {
+    rec = {
+      title: mlLoading ? 'Inisialisasi Model ML' : 'Menunggu Data Sensor',
+      text: mlLoading
+        ? 'Sistem sedang memuat model machine learning...'
+        : 'Sistem sedang mengumpulkan pembacaan lingkungan untuk memberikan rekomendasi yang akurat.',
+      plants: [],
+      tips: [],
+      confidence: '–',
+      accentColor: COLORS.textLight,
+      source: 'fallback',
+    };
+  }
 
   return (
     <View style={styles.container}>
@@ -147,10 +138,10 @@ const RecommendationCard: React.FC<RecommendationCardProps> = ({ sensors }) => {
 
       {/* Header */}
       <View style={styles.headerRow}>
-        <View style={{ flex: 1 }}>
+        <View style={styles.headerContent}>
           <Text style={styles.title}>{rec.title}</Text>
         </View>
-        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+        <View style={styles.headerMeta}>
           {rec.confidence !== '–' && (
             <View style={[styles.badge, { borderColor: rec.accentColor + '30' }]}>
               <Text style={[styles.badgeText, { color: rec.accentColor }]}>
@@ -196,13 +187,24 @@ const RecommendationCard: React.FC<RecommendationCardProps> = ({ sensors }) => {
       {!loadingAI ? (
         <TouchableOpacity style={styles.aiButton} onPress={fetchAI} activeOpacity={0.8}>
           <Text style={styles.aiButtonText}>
-            {aiRec ? '🔄 Perbarui Analisis AI' : '✨ Dapatkan Insight AI (Gemini)'}
+            {aiRec ? '🔄 Perbarui Analisis AI' : '✨ Dapatkan Insight Lanjutan (Gemini)'}
           </Text>
         </TouchableOpacity>
       ) : (
         <View style={styles.aiLoading}>
           <ActivityIndicator size="small" color={COLORS.primary} />
           <Text style={styles.aiLoadingText}>AI sedang menganalisis...</Text>
+        </View>
+      )}
+
+      {/* ML Model Status */}
+      {!aiRec && (
+        <View style={styles.mlStatus}>
+          <Text style={styles.mlStatusText}>
+            {mlLoading
+              ? '⚙️ Memuat model ML...'
+              : `✓ Model ML siap (skor lingkungan: ${mlPrediction?.environmentScore || 0}%)`}
+          </Text>
         </View>
       )}
     </View>
@@ -238,6 +240,14 @@ const getStyles = (COLORS: any) => StyleSheet.create({
     gap: 12,
     marginBottom: 16,
     paddingLeft: 4,
+  },
+  headerContent: {
+    flex: 1,
+  },
+  headerMeta: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
   },
   title: {
     color: COLORS.textPrimary,
@@ -373,6 +383,21 @@ const getStyles = (COLORS: any) => StyleSheet.create({
     color: COLORS.primary,
     fontSize: 15,
     fontFamily: 'Inter-Bold',
+  },
+  mlStatus: {
+    marginTop: 16,
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    backgroundColor: COLORS.surfaceElevated,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: COLORS.borderLight,
+  },
+  mlStatusText: {
+    color: COLORS.textMuted,
+    fontSize: 12,
+    fontFamily: 'Inter-Medium',
+    textAlign: 'center',
   },
 });
 

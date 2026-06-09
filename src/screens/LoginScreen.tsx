@@ -7,7 +7,7 @@ import {
   Platform, KeyboardAvoidingView, Animated, Easing, Image
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { USERS } from '../utils/config';
+import DataStore from '../services/DataStore';
 import { useTheme } from '../utils/theme';
 
 interface LoginScreenProps {
@@ -45,7 +45,8 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onLogin }) => {
   };
 
   const handleLogin = () => {
-    const user = USERS[username.trim()];
+    const users = DataStore.getUsers();
+    const user = users[username.trim()];
     if (user && user.password === password) {
       setError(false);
       setLoading(true);
@@ -76,7 +77,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onLogin }) => {
             <View style={styles.brandMark}>
               <Image 
                 source={require('../assets/images/logo.png')} 
-                style={{ width: 48, height: 48, borderRadius: 24 }} 
+                style={styles.brandImage}
                 resizeMode="cover" 
               />
             </View>
@@ -188,6 +189,11 @@ const getStyles = (COLORS: any) => StyleSheet.create({
     shadowOffset: { width: 0, height: 8 },
     shadowOpacity: 0.08,
     shadowRadius: 16,
+  },
+  brandImage: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
   },
   brandName: {
     fontSize: 36,

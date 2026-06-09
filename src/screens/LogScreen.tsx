@@ -2,7 +2,7 @@
 // AgriSense · Activity Log Screen
 // ──────────────────────────────────────────────
 import React, { useState, useEffect, useCallback } from 'react';
-import { View, Text, ScrollView, StyleSheet, TouchableOpacity, RefreshControl } from 'react-native';
+import { View, Text, ScrollView, StyleSheet, TouchableOpacity, RefreshControl, TextInput, KeyboardAvoidingView, Platform } from 'react-native';
 import { useTheme } from '../utils/theme';
 import DataStore, { LogEntry } from '../services/DataStore';
 
@@ -22,6 +22,7 @@ const LogScreen: React.FC = () => {
   const [logs, setLogs] = useState<LogEntry[]>([]);
   const [filter, setFilter] = useState<FilterType>('all');
   const [refreshing, setRefreshing] = useState(false);
+  const [note, setNote] = useState('');
 
   const refresh = useCallback(() => {
     setLogs(DataStore.getLogs());
@@ -46,6 +47,13 @@ const LogScreen: React.FC = () => {
 
   const clearAll = () => {
     DataStore.clearLogs();
+    refresh();
+  };
+
+  const handleAddNote = () => {
+    if (!note.trim()) return;
+    DataStore.addLog('success', note.trim(), 'action');
+    setNote('');
     refresh();
   };
 
@@ -78,6 +86,20 @@ const LogScreen: React.FC = () => {
             </TouchableOpacity>
           ))}
         </ScrollView>
+      </View>
+
+      {/* Input Catatan Manual */}
+      <View style={styles.noteInputContainer}>
+        <TextInput
+          style={styles.noteInput}
+          placeholder="Tambah catatan lapangan..."
+          placeholderTextColor={COLORS.textMuted}
+          value={note}
+          onChangeText={setNote}
+        />
+        <TouchableOpacity style={styles.addNoteBtn} onPress={handleAddNote} disabled={!note.trim()}>
+          <Text style={styles.addNoteText}>Simpan</Text>
+        </TouchableOpacity>
       </View>
 
       <ScrollView
@@ -116,7 +138,7 @@ const LogScreen: React.FC = () => {
           </View>
         )}
 
-        <View style={{ height: 40 }} />
+        <View style={styles.bottomSpacer} />
       </ScrollView>
     </View>
   );
@@ -144,9 +166,9 @@ const getStyles = (COLORS: any) => StyleSheet.create({
   headerSub: { fontSize: 14, color: COLORS.textMuted, marginTop: 4, fontFamily: 'Inter-Medium' },
   clearBtn: {
     paddingHorizontal: 16, paddingVertical: 8, borderRadius: 12,
-    backgroundColor: COLORS.surfaceElevated, borderWidth: 1.5, borderColor: COLORS.glassBorder,
+    backgroundColor: COLORS.errorSoft, borderWidth: 1.5, borderColor: COLORS.error,
   },
-  clearText: { fontSize: 12, color: COLORS.textPrimary, fontFamily: 'Inter-Bold' },
+  clearText: { fontSize: 12, color: COLORS.error, fontFamily: 'Inter-Bold' },
 
   filterRow: { paddingHorizontal: 24, gap: 10 },
   filterChip: {
@@ -158,6 +180,40 @@ const getStyles = (COLORS: any) => StyleSheet.create({
   filterTextActive: { color: COLORS.background },
 
   scroll: { padding: 20 },
+  bottomSpacer: { height: 40 },
+
+  noteInputContainer: {
+    flexDirection: 'row',
+    paddingHorizontal: 20,
+    paddingTop: 16,
+    paddingBottom: 8,
+    gap: 10,
+    alignItems: 'center',
+  },
+  noteInput: {
+    flex: 1,
+    backgroundColor: COLORS.surface,
+    borderWidth: 1.5,
+    borderColor: COLORS.glassBorder,
+    borderRadius: 16,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    fontSize: 14,
+    fontFamily: 'Inter-Medium',
+    color: COLORS.textPrimary,
+  },
+  addNoteBtn: {
+    backgroundColor: COLORS.primary,
+    paddingHorizontal: 16,
+    paddingVertical: 14,
+    borderRadius: 16,
+    justifyContent: 'center',
+  },
+  addNoteText: {
+    color: COLORS.background,
+    fontFamily: 'Outfit-Bold',
+    fontSize: 14,
+  },
 
   emptyCard: {
     backgroundColor: COLORS.surface, borderRadius: 28, padding: 48,

@@ -58,6 +58,11 @@ const AlertBanner: React.FC<AlertBannerProps> = ({ alerts }) => {
         <Text style={[styles.message, isDanger ? styles.dangerMsg : styles.warningMsg]}>
           {latest.message}
         </Text>
+        {!!latest.sop && (
+          <View style={styles.sopContainer}>
+            <Text style={styles.sopText}>{latest.sop}</Text>
+          </View>
+        )}
       </View>
     </Animated.View>
   );
@@ -130,6 +135,17 @@ const getStyles = (COLORS: any) => StyleSheet.create({
   },
   warningMsg: {
     color: 'rgba(212,129,10,0.7)',
+  },
+  sopContainer: {
+    marginTop: 6,
+    paddingTop: 6,
+    borderTopWidth: 1,
+    borderTopColor: 'rgba(0,0,0,0.05)',
+  },
+  sopText: {
+    fontSize: 11,
+    fontFamily: 'Inter-SemiBold',
+    color: COLORS.textPrimary,
   },
 });
 

@@ -15,7 +15,6 @@
 		6E4A61EC038FFFFE8A01A9A9 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB81A68108700A75B9A /* PrivacyInfo.xcprivacy */; };
 		761780ED2CA45674006654EE /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 761780EC2CA45674006654EE /* AppDelegate.swift */; };
 		7B590C2DC9214BAC95DDCDF1 /* Outfit-SemiBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 456C3A54A4C04A149B6CE049 /* Outfit-SemiBold.ttf */; };
-		81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */; };
 		CB0B056757D643A2851D838C /* Inter-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 61742EB5A0F948BA856F898E /* Inter-Regular.ttf */; };
 		CCB9477D07954EA69B15FF5D /* Inter-Medium.ttf in Resources */ = {isa = PBXBuildFile; fileRef = F0EC27B54E5C4149BA4ED966 /* Inter-Medium.ttf */; };
 		EB8D7AB52CAC4240951B0339 /* Outfit-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = C70D5E21E3054A53A3C033F5 /* Outfit-Regular.ttf */; };
@@ -36,7 +35,6 @@
 		61742EB5A0F948BA856F898E /* Inter-Regular.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Inter-Regular.ttf"; path = "../assets/fonts/Inter-Regular.ttf"; sourceTree = "<group>"; };
 		6F31B557E1D1489CBABB056E /* Outfit-Bold.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Outfit-Bold.ttf"; path = "../assets/fonts/Outfit-Bold.ttf"; sourceTree = "<group>"; };
 		761780EC2CA45674006654EE /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = AppDelegate.swift; path = MonitoringMobile/AppDelegate.swift; sourceTree = "<group>"; };
-		81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = LaunchScreen.storyboard; path = MonitoringMobile/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		C70D5E21E3054A53A3C033F5 /* Outfit-Regular.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Outfit-Regular.ttf"; path = "../assets/fonts/Outfit-Regular.ttf"; sourceTree = "<group>"; };
 		CDE2B377934D43769EFD3364 /* Outfit-Medium.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Outfit-Medium.ttf"; path = "../assets/fonts/Outfit-Medium.ttf"; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
@@ -61,7 +59,6 @@
 				13B07FB51A68108700A75B9A /* Images.xcassets */,
 				761780EC2CA45674006654EE /* AppDelegate.swift */,
 				13B07FB61A68108700A75B9A /* Info.plist */,
-				81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */,
 				13B07FB81A68108700A75B9A /* PrivacyInfo.xcprivacy */,
 			);
 			name = MonitoringMobile;
@@ -190,7 +187,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */,
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
 				6E4A61EC038FFFFE8A01A9A9 /* PrivacyInfo.xcprivacy in Resources */,
 				CCB9477D07954EA69B15FF5D /* Inter-Medium.ttf in Resources */,

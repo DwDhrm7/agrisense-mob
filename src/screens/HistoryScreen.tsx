@@ -2,7 +2,7 @@
 // AgriSense · History Screen
 // ──────────────────────────────────────────────
 import React, { useState, useEffect, useCallback } from 'react';
-import { View, Text, ScrollView, StyleSheet, TouchableOpacity, RefreshControl, Dimensions } from 'react-native';
+import { View, Text, ScrollView, StyleSheet, TouchableOpacity, RefreshControl } from 'react-native';
 import { useTheme } from '../utils/theme';
 import DataStore, { HistoryEntry } from '../services/DataStore';
 
@@ -135,7 +135,7 @@ const HistoryScreen: React.FC = () => {
               <View style={styles.table}>
                 {/* Table header */}
                 <View style={styles.tableHeader}>
-                  <Text style={[styles.tableHeaderCell, { flex: 1.2 }]}>Waktu</Text>
+                  <Text style={[styles.tableHeaderCell, styles.tableTimeHeaderCell]}>Waktu</Text>
                   <Text style={styles.tableHeaderCell}>Suhu</Text>
                   <Text style={styles.tableHeaderCell}>Hum</Text>
                   <Text style={styles.tableHeaderCell}>EC</Text>
@@ -143,7 +143,7 @@ const HistoryScreen: React.FC = () => {
                 </View>
                 {history.slice().reverse().map((entry, i) => (
                   <View key={i} style={[styles.tableRow, i % 2 === 0 && styles.tableRowAlt]}>
-                    <Text style={[styles.tableCell, styles.tableCellTime, { flex: 1.2 }]}>{formatTime(entry.timestamp)}</Text>
+                    <Text style={[styles.tableCell, styles.tableCellTime, styles.tableTimeCell]}>{formatTime(entry.timestamp)}</Text>
                     <Text style={styles.tableCell}>{entry.suhu ?? '–'}</Text>
                     <Text style={styles.tableCell}>{entry.kelembapan ?? '–'}</Text>
                     <Text style={styles.tableCell}>{entry.ec ?? '–'}</Text>
@@ -155,7 +155,7 @@ const HistoryScreen: React.FC = () => {
           </View>
         )}
 
-        <View style={{ height: 40 }} />
+        <View style={styles.bottomSpacer} />
       </ScrollView>
     </View>
   );
@@ -282,6 +282,9 @@ const getStyles = (COLORS: any) => StyleSheet.create({
     flex: 1, fontSize: 11, fontFamily: 'Inter-Bold', color: COLORS.textMuted,
     textTransform: 'uppercase', letterSpacing: 1.5, textAlign: 'center',
   },
+  tableTimeHeaderCell: {
+    flex: 1.2,
+  },
   tableRow: { flexDirection: 'row', paddingHorizontal: 18, paddingVertical: 16 },
   tableRowAlt: { backgroundColor: COLORS.background },
   tableCell: {
@@ -289,6 +292,12 @@ const getStyles = (COLORS: any) => StyleSheet.create({
     textAlign: 'center', fontVariant: ['tabular-nums'],
   },
   tableCellTime: { fontFamily: 'Outfit-Bold', color: COLORS.textPrimary },
+  tableTimeCell: {
+    flex: 1.2,
+  },
+  bottomSpacer: {
+    height: 40,
+  },
 });
 
 export default HistoryScreen;
