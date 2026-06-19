@@ -21,7 +21,6 @@ import MqttService from '../services/MqttService';
 
 interface DashboardScreenProps {
   user?: any;
-  onLogout?: () => void;
   status: ConnectionStatus;
   sensors: SensorData;
   lastUpdate: string;
@@ -69,7 +68,6 @@ const ThemeSwitch = ({ isDark, onToggle, COLORS }: any) => {
 
 const DashboardScreen: React.FC<DashboardScreenProps> = ({
   user,
-  onLogout,
   status, sensors, lastUpdate, alerts, historyXY
 }) => {
   const [weather, setWeather] = useState<WeatherData | null>(null);

@@ -4,7 +4,7 @@
 import React, { useState } from 'react';
 import {
   View, Text, ScrollView, StyleSheet, TouchableOpacity,
-  TextInput, Alert, Share, Switch,
+  TextInput, Alert, Share,
 } from 'react-native';
 import { MQTT_CONFIG, SENSOR_THRESHOLDS, OPENMETEO_CONFIG, INFLUX_CONFIG } from '../utils/config';
 import { useTheme } from '../utils/theme';

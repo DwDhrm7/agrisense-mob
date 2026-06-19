@@ -71,7 +71,6 @@ const App = () => {
           {activeTab === 'dashboard' && (
             <DashboardScreen 
               user={user} 
-              onLogout={handleLogout} 
               status={mqttState.status}
               sensors={mqttState.sensors}
               lastUpdate={mqttState.lastUpdate}

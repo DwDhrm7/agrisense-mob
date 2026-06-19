@@ -38,7 +38,7 @@ function getRecommendationFromML(prediction: CropPrediction[], envScore: number,
   return {
     title: `${confidence >= 80 ? 'Sangat Direkomendasikan' : 'Direkomendasikan'}: ${topCrop.crop}`,
     text: `Skor lingkungan: ${envScore}%. Berdasarkan kondisi sensor saat ini (suhu, kelembapan, EC, TDS, suhu air), model ML memprediksi ${topCrop.crop} sebagai tanaman optimal untuk ditanam.`,
-    plants: prediction.map((crop, i) => ({
+    plants: prediction.map((crop) => ({
       name: crop.crop,
       detail: `Confidence: ${Math.round(crop.confidence)}% · Panen: ${crop.growthDays} hari`
     })),
@@ -187,7 +187,7 @@ const RecommendationCard: React.FC<RecommendationCardProps> = ({ sensors }) => {
       {!loadingAI ? (
         <TouchableOpacity style={styles.aiButton} onPress={fetchAI} activeOpacity={0.8}>
           <Text style={styles.aiButtonText}>
-            {aiRec ? '🔄 Perbarui Analisis AI' : '✨ Dapatkan Insight Lanjutan (Gemini)'}
+            {aiRec ? 'Perbarui Analisis AI' : 'Dapatkan Insight Lanjutan (Gemini)'}
           </Text>
         </TouchableOpacity>
       ) : (
@@ -202,7 +202,7 @@ const RecommendationCard: React.FC<RecommendationCardProps> = ({ sensors }) => {
         <View style={styles.mlStatus}>
           <Text style={styles.mlStatusText}>
             {mlLoading
-              ? '⚙️ Memuat model ML...'
+              ? 'Memuat model ML...'
               : `✓ Model ML siap (skor lingkungan: ${mlPrediction?.environmentScore || 0}%)`}
           </Text>
         </View>

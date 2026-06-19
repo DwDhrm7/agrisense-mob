@@ -2,7 +2,7 @@
 // AgriSense · Activity Log Screen
 // ──────────────────────────────────────────────
 import React, { useState, useEffect, useCallback } from 'react';
-import { View, Text, ScrollView, StyleSheet, TouchableOpacity, RefreshControl, TextInput, KeyboardAvoidingView, Platform } from 'react-native';
+import { View, Text, ScrollView, StyleSheet, TouchableOpacity, RefreshControl, TextInput } from 'react-native';
 import { useTheme } from '../utils/theme';
 import DataStore, { LogEntry } from '../services/DataStore';
 
