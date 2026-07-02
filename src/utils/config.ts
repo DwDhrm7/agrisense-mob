@@ -26,7 +26,7 @@ export const MQTT_CONFIG = {
 export const INFLUX_CONFIG = {
   host: INFLUX_HOST || 'http://192.168.0.79:8086',
   db: INFLUX_DB || 'sensor_db',
-  interval: 5000,
+  interval: 7000,
 };
 
 export const OPENMETEO_CONFIG = {

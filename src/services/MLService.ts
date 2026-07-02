@@ -1,11 +1,7 @@
 // ──────────────────────────────────────────────
-// AgriSense · Machine Learning Service
-// ──────────────────────────────────────────────
-// TensorFlow.js model inference for crop recommendations
-// Backend training: Python (separate device)
+// AgriSense · Recommendation Service (Rule-Based)
 // ──────────────────────────────────────────────
 
-import * as tf from '@tensorflow/tfjs';
 import type { SensorData } from './MqttService';
 
 // Model prediction output
@@ -129,38 +125,16 @@ const CROPS_DB: Record<string, CropPrediction> = {
 };
 
 class MLService {
-  private model: tf.GraphModel | null = null;
-  private modelUrl: string = '';
-  private isInitialized = false;
+  private isInitialized = true;
   private lastPrediction: MLPredictionResult | null = null;
   private predictionCache: Map<string, MLPredictionResult> = new Map();
 
   /**
-   * Initialize ML service with model URL
-   * Default: uses bundled model or backend URL
+   * Initialize ML service
    */
-  async init(modelUrl?: string) {
-    try {
-      // Default to bundled model in assets
-      this.modelUrl = modelUrl || 'file:///model/agrisense_model.json';
-      
-      console.log('[ML] Initializing TensorFlow.js');
-      await tf.ready();
-
-      console.log(`[ML] Loading model from: ${this.modelUrl}`);
-      try {
-        this.model = await tf.loadGraphModel(this.modelUrl);
-        this.isInitialized = true;
-        console.log('[ML] Model loaded successfully');
-      } catch (loadError) {
-        console.warn(`[ML] Failed to load from ${this.modelUrl}`, loadError);
-        console.log('[ML] Will use fallback rule-based predictions');
-        this.isInitialized = true; // Allow fallback mode
-      }
-    } catch (error) {
-      console.error('[ML] Initialization failed:', error);
-      throw error;
-    }
+  async init() {
+    console.log('[ML] Initializing Rule-Based Recommendation Service');
+    this.isInitialized = true;
   }
 
   /**
@@ -173,13 +147,7 @@ class MLService {
       return this.predictionCache.get(cacheKey)!;
     }
 
-    let result: MLPredictionResult;
-
-    if (this.model && this.isInitialized) {
-      result = this._predictWithModel(sensors);
-    } else {
-      result = this._predictFallback(sensors);
-    }
+    const result = this._predictFallback(sensors);
 
     this.predictionCache.set(cacheKey, result);
     this.lastPrediction = result;
@@ -196,60 +164,7 @@ class MLService {
   }
 
   /**
-   * Predict using TensorFlow model
-   */
-  private _predictWithModel(sensors: SensorData): MLPredictionResult {
-    try {
-      const s = parseFloat(sensors.suhu || '');
-      const h = parseFloat(sensors.kelembapan || '');
-      const ec = parseFloat(sensors.ec || '');
-      const tds = parseFloat(sensors.tds || '');
-      const waterTemp = parseFloat(sensors.suhuAir || '');
-
-      if (isNaN(s) || isNaN(h) || isNaN(ec)) {
-        return this._getPendingResult();
-      }
-
-      // Normalize inputs (0-1 range based on typical greenhouse conditions)
-      const normalized = tf.tensor2d([[
-        s / 40,           // suhu: 0-40°C
-        h / 100,          // kelembapan: 0-100%
-        ec / 2000,        // ec: 0-2000 µS/cm
-        tds / 1500,       // tds: 0-1500 ppm
-        waterTemp / 50    // suhuAir: 0-50°C
-      ]]);
-
-      // Run prediction
-      const predictions = this.model!.predict(normalized) as tf.Tensor;
-      const confidences = predictions.dataSync();
-
-      // Get top 3 predictions
-      const indices = Array.from(confidences)
-        .map((conf, idx) => ({ conf, idx }))
-        .sort((a, b) => b.conf - a.conf)
-        .slice(0, 3);
-
-      const topCrops = this._mapIndicesToCrops(indices);
-
-      // Calculate environment score
-      const envScore = this._calculateEnvironmentScore(s, h, ec);
-
-      normalized.dispose();
-      predictions.dispose();
-
-      return {
-        topCrops,
-        environmentScore: envScore,
-        timestamp: Date.now(),
-      };
-    } catch (error) {
-      console.error('[ML] Prediction error:', error);
-      return this._predictFallback(sensors);
-    }
-  }
-
-  /**
-   * Fallback: Rule-based prediction (when model unavailable)
+   * Rule-based prediction (without ML model)
    */
   private _predictFallback(sensors: SensorData): MLPredictionResult {
     const s = parseFloat(sensors.suhu || '');
@@ -316,21 +231,7 @@ class MLService {
     return Math.max(0, score);
   }
 
-  /**
-   * Map model output indices to crop database
-   */
-  private _mapIndicesToCrops(
-    indices: Array<{ conf: number; idx: number }>
-  ): CropPrediction[] {
-    const cropKeys = Object.keys(CROPS_DB);
-    return indices.map(({ conf, idx }) => {
-      const cropKey = cropKeys[idx % cropKeys.length];
-      return {
-        ...(CROPS_DB[cropKey] || CROPS_DB.kangkung),
-        confidence: Math.round(conf * 100),
-      } as CropPrediction;
-    });
-  }
+
 
   /**
    * Get cache key from sensor data
@@ -363,8 +264,8 @@ class MLService {
   getStatus() {
     return {
       initialized: this.isInitialized,
-      modelLoaded: this.model !== null,
-      modelUrl: this.modelUrl,
+      modelLoaded: false, // Model is replaced by rules
+      modelUrl: '',
       lastPredictionTime: this.lastPrediction?.timestamp || null,
     };
   }
@@ -414,13 +315,9 @@ class MLService {
   }
 
   /**
-   * Dispose model and free resources
+   * Dispose resources
    */
   dispose() {
-    if (this.model) {
-      this.model.dispose();
-      this.model = null;
-    }
     this.predictionCache.clear();
   }
 }
